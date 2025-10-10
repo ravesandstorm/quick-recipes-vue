@@ -121,6 +121,8 @@
 </template>
 
 <script setup lang="ts">
+import type { response, Error } from '../../../types'
+
 definePageMeta({
   auth: false,
   layout: false
@@ -172,7 +174,7 @@ const signUpWithCredentials = async () => {
   }
 
   try {
-    const response = await $fetch('/api/auth/signup', {
+    const response: response = await $fetch('/api/auth/signup', {
       method: 'POST',
       body: {
         name: form.name,
@@ -181,6 +183,9 @@ const signUpWithCredentials = async () => {
       }
     })
 
+    // Save user to localStorage
+    localStorage.setItem('user', JSON.stringify(response.user))
+
     success.value = 'Account created successfully! Redirecting to login...'
 
     // Wait a moment then redirect to login
@@ -188,9 +193,9 @@ const signUpWithCredentials = async () => {
       await navigateTo('/auth/login')
     }, 2000)
 
-  } catch (err: any) {
-    error.value = err.data?.message || 'Failed to create account'
-    console.error('Signup error:', err)
+  } catch (err: unknown) {
+    error.value = (err as Error)?.statusMessage || 'Failed to create account'
+    console.error('Signup error:', (err as Error)?.statusMessage)
   } finally {
     loading.value = false
   }

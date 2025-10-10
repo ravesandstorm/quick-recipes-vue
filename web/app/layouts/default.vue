@@ -32,9 +32,15 @@
               </div>
               <button
                 @click="performSearch"
-                class="absolute inset-y-0 right-0 pr-3 flex items-center"
+                class="absolute inset-y-0 right-12 pr-3 flex items-center"
               >
                 <span class="text-blue-600 hover:text-blue-700 text-sm font-medium">Search</span>
+              </button>
+              <button
+                @click="goToAdvancedSearch"
+                class="absolute inset-y-0 right-0 pr-3 flex items-center"
+              >
+                <span class="text-gray-600 hover:text-gray-700 text-sm font-medium">Advanced</span>
               </button>
             </div>
           </div>
@@ -154,7 +160,13 @@ const handleSignOut = async () => {
 const performSearch = () => {
   if (searchQuery.value.trim()) {
     navigateTo(`/search?q=${encodeURIComponent(searchQuery.value.trim())}`)
+  } else {
+    navigateTo('/search')
   }
+}
+
+const goToAdvancedSearch = () => {
+  navigateTo('/search')
 }
 
 // Close dropdown when clicking outside

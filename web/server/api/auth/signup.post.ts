@@ -1,11 +1,11 @@
 import bcrypt from 'bcryptjs'
 import { connectToDatabase, getCollection } from '../../utils/db'
-import type { User, SignupCredentials } from '../../../types'
+import type { User, SignupCredentials, Error } from '../../../types'
 
 export default defineEventHandler(async (event) => {
   try {
     const body = await readBody(event) as SignupCredentials
-    
+
     if (!body.email || !body.password || !body.name) {
       throw createError({
         statusCode: 400,
@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
 
     await connectToDatabase()
     const users = getCollection('users')
-    
+
     // Check if user already exists
     const existingUser = await users.findOne({ email: body.email })
     if (existingUser) {
@@ -48,7 +48,7 @@ export default defineEventHandler(async (event) => {
     }
 
     const result = await users.insertOne(newUser)
-    
+
     return {
       success: true,
       user: {
@@ -57,11 +57,11 @@ export default defineEventHandler(async (event) => {
         name: newUser.name
       }
     }
-  } catch (error) {
-    if (error.statusCode) {
+  } catch (error: unknown) {
+    if ((error as Error).statusCode) {
       throw error
     }
-    
+
     console.error('Signup error:', error)
     throw createError({
       statusCode: 500,

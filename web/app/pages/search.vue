@@ -227,7 +227,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Recipe, SearchFilters } from '~/types'
+import type { Recipe, SearchFilters } from '../../types'
 
 const route = useRoute()
 const router = useRouter()
@@ -252,11 +252,11 @@ const filters = reactive<SearchFilters>({
   maxProtein: undefined,
   minCarbs: undefined,
   maxCarbs: undefined,
-  sortBy: 'relevance',
+  sortBy: 'favoriteCount',
   sortOrder: 'desc'
 })
 
-const quickSort = ref('relevance')
+const quickSort = ref('favoriteCount')
 
 const searchSuggestions = [
   'Pasta',
@@ -304,7 +304,7 @@ const performSearch = async (loadMore = false) => {
     if (!loadMore) {
       const query: any = {}
       if (searchQuery.value) query.q = searchQuery.value
-      if (quickSort.value !== 'relevance') query.sort = quickSort.value
+      if (quickSort.value !== 'favoriteCount') query.sort = quickSort.value
       
       await router.replace({ query })
     }
@@ -334,10 +334,10 @@ const clearFilters = () => {
     maxProtein: undefined,
     minCarbs: undefined,
     maxCarbs: undefined,
-    sortBy: 'relevance',
+    sortBy: 'favoriteCount',
     sortOrder: 'desc'
   })
-  quickSort.value = 'relevance'
+  quickSort.value = 'favoriteCount'
   performSearch()
 }
 

@@ -1,22 +1,24 @@
+import { ObjectId } from 'mongodb'
 import { connectToDatabase, getCollection } from '../../utils/db'
 import type { Recipe, RecipeFormData } from '../../../types'
 
 export default defineEventHandler(async (event) => {
   try {
-    // Mock authentication for now
-    const userId = 'mock-user-id'
-
-    if (!userId) {
-      throw createError({
-        statusCode: 401,
-        statusMessage: 'Authentication required'
-      })
-    }
-    
     const body = await readBody(event) as RecipeFormData & {
       calories: number
       protein: number
       carbs: number
+      userId?: string
+    }
+
+    // Get user ID from request body
+    const userId = body.userId
+
+    if (!userId) {
+      throw createError({
+        statusCode: 401,
+        statusMessage: 'User ID is required'
+      })
     }
     
     if (!body.title || !body.description || !body.instructions?.length || !body.ingredients?.length) {
@@ -50,15 +52,20 @@ export default defineEventHandler(async (event) => {
     
     const result = await recipes.insertOne(newRecipe)
     const recipeId = result.insertedId.toString()
-    
-    // Update user's created recipes (mock for now)
-    // await users.updateOne(
-    //   { _id: userId },
-    //   {
-    //     $push: { createdRecipes: recipeId },
-    //     $set: { updatedAt: new Date() }
-    //   }
-    // )
+
+    // Update user's created recipes
+    try {
+      await users.updateOne(
+        { _id: new ObjectId(userId) },
+        {
+          $push: { createdRecipes: recipeId },
+          $set: { updatedAt: new Date() }
+        }
+      )
+    } catch (userUpdateError) {
+      console.warn('Failed to update user created recipes:', userUpdateError)
+      // Don't fail the recipe creation if user update fails
+    }
     
     return {
       success: true,

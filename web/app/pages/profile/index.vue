@@ -211,14 +211,28 @@
 </template>
 
 <script setup lang="ts">
-import { useAuth } from '#auth/client'
-import type { Recipe, User } from '~/types'
+// import { useAuth } from '#auth/client'
+import type { Recipe, User } from '../../../types'
 
 definePageMeta({
   middleware: 'auth'
 })
 
-const { data: authData } = useAuth()
+// get authData from localStore (client-side only)
+const authData = ref<{ id: string } | null>(null)
+
+// Initialize auth data on client side
+const initializeAuth = () => {
+  if (process.client) {
+    try {
+      const localData = localStorage.getItem('user')
+      authData.value = localData ? JSON.parse(localData) : null
+    } catch (error) {
+      console.error('Error reading user data from localStorage:', error)
+      authData.value = null
+    }
+  }
+}
 
 const user = ref<User | null>(null)
 const loading = ref(false)
@@ -244,25 +258,25 @@ const editForm = reactive({
 const fetchProfile = async () => {
   try {
     pending.value = true
-    
-    if (!authData.value?.user?.id) {
+
+    if (!authData.value?.id) {
       return
     }
-    
-    const { data } = await $fetch(`/api/users/${authData.value.user.id}`)
+
+    const { data } = await $fetch(`/api/users/${authData.value.id}`)
     user.value = data
-    
+
     // Update edit form
     editForm.name = data.name || ''
     editForm.bio = data.bio || ''
-    
+
     // Update stats
     stats.value = {
       recipesCount: data.createdRecipes?.length || 0,
       followersCount: data.followers?.length || 0,
       followingCount: data.following?.length || 0
     }
-    
+
   } catch (error) {
     console.error('Error fetching profile:', error)
   } finally {
@@ -320,9 +334,17 @@ watch(activeTab, () => {
 })
 
 onMounted(async () => {
-  await fetchProfile()
-  if (user.value) {
-    await fetchRecipes()
+  // Initialize auth data first
+  initializeAuth()
+
+  // Wait for auth data to be available
+  await nextTick()
+
+  if (authData.value) {
+    await fetchProfile()
+    if (user.value) {
+      await fetchRecipes()
+    }
   }
 })
 </script>

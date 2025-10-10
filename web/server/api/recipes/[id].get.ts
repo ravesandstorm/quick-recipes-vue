@@ -25,9 +25,20 @@ export default defineEventHandler(async (event) => {
           $match: { _id: new ObjectId(recipeId) }
         },
         {
+          $addFields: {
+            createdByObjectId: {
+              $cond: {
+                if: { $type: "$createdByID" },
+                then: { $toObjectId: "$createdByID" },
+                else: null
+              }
+            }
+          }
+        },
+        {
           $lookup: {
             from: 'users',
-            localField: 'createdByID',
+            localField: 'createdByObjectId',
             foreignField: '_id',
             as: 'creator'
           }
@@ -104,8 +115,8 @@ export default defineEventHandler(async (event) => {
       success: true,
       data: recipeData
     }
-  } catch (error) {
-    if (error.statusCode) {
+  } catch (error: unknown) {
+    if ((error as any).statusCode) {
       throw error
     }
     

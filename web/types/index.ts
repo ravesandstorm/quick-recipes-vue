@@ -2,7 +2,7 @@ import { ObjectId } from 'mongodb'
 
 export interface User {
   _id?: ObjectId
-  id?: string
+  id?: number
   email: string
   name: string
   bio?: string
@@ -51,9 +51,7 @@ export interface Ingredient {
   proteinPerUnit: number
   carbsPerUnit: number
   defaultUnit: string // "grams", "ml", "pieces", etc.
-  alternativeNames?: string[] // For better search
   category?: string // "vegetable", "protein", "grain", etc.
-  createdAt: Date
 }
 
 export interface SearchFilters {
@@ -74,9 +72,9 @@ export interface SearchFilters {
 }
 
 export interface AuthUser {
-  id: string
+  id?: number
   email: string
-  name: string
+  name?: string
   avatar?: string
 }
 
@@ -110,7 +108,13 @@ export interface UserProfile {
   isFollowing?: boolean
 }
 
-export interface error {
+export interface Error {
   statusCode: number
   statusMessage: string
+}
+
+export interface response {
+  success?: boolean
+  error?: Error
+  user?: AuthUser
 }

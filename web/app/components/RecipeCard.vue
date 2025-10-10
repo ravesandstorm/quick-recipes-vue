@@ -25,17 +25,26 @@
     
     <!-- Recipe Info -->
     <div class="p-6">
-      <h3 class="text-lg font-semibold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors line-clamp-2">
-        {{ recipe.title }}
-      </h3>
-      
+      <!-- Title with Rating -->
+      <div class="flex items-start justify-between mb-2">
+        <h3 class="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2 flex-1 pr-2">
+          {{ recipe.title }}
+        </h3>
+        <div class="flex items-center space-x-1 text-sm text-gray-500 flex-shrink-0">
+          <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+          </svg>
+          <span class="font-medium">{{ recipe.rating || 'N/A' }}</span>
+        </div>
+      </div>
+
       <p class="text-gray-600 text-sm mb-4 line-clamp-2">
         {{ recipe.description }}
       </p>
-      
+
       <!-- Recipe Stats -->
       <div class="flex items-center justify-between text-sm text-gray-500 mb-4">
-        <div class="flex items-center space-x-4">
+        <div class="flex items-center space-x-3">
           <div class="flex items-center space-x-1">
             <span>🔥</span>
             <span>{{ recipe.calories }} cal</span>
@@ -49,12 +58,12 @@
             <span>{{ recipe.carbs }}g</span>
           </div>
         </div>
-        
-        <div class="flex items-center space-x-1">
-          <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+
+        <div class="flex items-center space-x-1 text-red-500">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
           </svg>
-          <span>{{ recipe.rating || 'N/A' }}</span>
+          <span class="font-medium">{{ recipe.favoriteCount || 0 }}</span>
         </div>
       </div>
       
@@ -81,7 +90,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Recipe } from '~/types'
+import type { Recipe } from '../../types'
 
 interface Props {
   recipe: Recipe & { createdBy?: string }
@@ -104,7 +113,7 @@ const toggleFavorite = async () => {
     isFavorited.value = !isFavorited.value
     // API call to toggle favorite
     await $fetch(`/api/recipes/${props.recipe.id}/favorite`, {
-      method: 'POST'
+      method: 'POST' as const
     })
   } catch (error) {
     // Revert on error
@@ -129,6 +138,7 @@ const getCreatorInitial = () => {
 .line-clamp-2 {
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }

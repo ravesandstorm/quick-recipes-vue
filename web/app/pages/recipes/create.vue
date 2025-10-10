@@ -258,15 +258,24 @@ const saveDraft = () => {
 
 const submitRecipe = async () => {
   if (!isFormValid.value) return
-  
+
   submitting.value = true
-  
+
   try {
+    // Get user data from localStorage
+    const localData = localStorage.getItem('user')
+    const authData = localData ? JSON.parse(localData) : null
+
+    if (!authData?.id) {
+      throw new Error('User not authenticated')
+    }
+
     const { data } = await $fetch('/api/recipes', {
       method: 'POST',
       body: {
         ...form,
-        ...calculatedNutrition.value
+        ...calculatedNutrition.value,
+        userId: authData.id
       }
     })
     

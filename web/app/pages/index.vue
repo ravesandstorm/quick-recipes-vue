@@ -8,9 +8,41 @@
           Recipes
         </span>
       </h1>
-      <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+      <p class="text-xl text-gray-600 max-w-2xl mx-auto mb-8">
         Find, create, and share delicious recipes with our community of food lovers
       </p>
+
+      <!-- Quick Search -->
+      <div class="max-w-2xl mx-auto">
+        <div class="flex space-x-4">
+          <div class="flex-1 relative">
+            <input
+              v-model="quickSearchQuery"
+              @keyup.enter="performQuickSearch"
+              type="text"
+              placeholder="Search for recipes..."
+              class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg"
+            />
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg class="h-6 w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+          </div>
+          <button
+            @click="performQuickSearch"
+            class="btn-primary px-8"
+          >
+            Search
+          </button>
+          <button
+            @click="goToAdvancedSearch"
+            class="btn-secondary px-6"
+          >
+            Advanced
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- Quick Stats -->
@@ -131,6 +163,7 @@ const { user } = useSimpleAuth()
 
 const loading = ref(true)
 const recipes = ref<Recipe[]>([])
+const quickSearchQuery = ref('')
 const stats = ref({
   totalRecipes: 0,
   totalUsers: 0,
@@ -148,6 +181,18 @@ const categories = [
 
 const searchByCategory = (category: string) => {
   navigateTo(`/search?category=${encodeURIComponent(category)}`)
+}
+
+const performQuickSearch = () => {
+  if (quickSearchQuery.value.trim()) {
+    navigateTo(`/search?q=${encodeURIComponent(quickSearchQuery.value.trim())}`)
+  } else {
+    navigateTo('/search')
+  }
+}
+
+const goToAdvancedSearch = () => {
+  navigateTo('/search')
 }
 
 // Fetch featured recipes and stats

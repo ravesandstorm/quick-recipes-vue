@@ -1,7 +1,8 @@
-// Simple auth composable for demo purposes
+import type { AuthUser } from '../../types'
 
+// Simple auth composable for demo purposes
 export const useSimpleAuth = () => {
-  const user = ref()
+  const user = ref<AuthUser | null>(null)
   const status = ref('loading')
 
   // Check for user in localStorage on client side

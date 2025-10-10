@@ -1,4 +1,4 @@
-import { connectToDatabase, getCollection } from '../utils/db'
+import { connectToDatabase, getCollection } from '../../server/utils/db'
 import bcrypt from 'bcryptjs'
 import type { User, Recipe, Ingredient } from '../../types'
 
@@ -27,8 +27,7 @@ export default defineEventHandler(async (event) => {
         proteinPerUnit: 0.31,
         carbsPerUnit: 0,
         defaultUnit: 'grams',
-        category: 'protein',
-        createdAt: new Date()
+        category: 'protein'
       },
       {
         name: 'Brown Rice',
@@ -38,8 +37,7 @@ export default defineEventHandler(async (event) => {
         proteinPerUnit: 0.023,
         carbsPerUnit: 0.23,
         defaultUnit: 'grams',
-        category: 'grain',
-        createdAt: new Date()
+        category: 'grain'
       },
       {
         name: 'Broccoli',
@@ -49,8 +47,7 @@ export default defineEventHandler(async (event) => {
         proteinPerUnit: 0.028,
         carbsPerUnit: 0.07,
         defaultUnit: 'grams',
-        category: 'vegetable',
-        createdAt: new Date()
+        category: 'vegetable'
       },
       {
         name: 'Olive Oil',
@@ -60,8 +57,7 @@ export default defineEventHandler(async (event) => {
         proteinPerUnit: 0,
         carbsPerUnit: 0,
         defaultUnit: 'ml',
-        category: 'fat',
-        createdAt: new Date()
+        category: 'fat'
       },
       {
         name: 'Eggs',
@@ -71,8 +67,7 @@ export default defineEventHandler(async (event) => {
         proteinPerUnit: 6,
         carbsPerUnit: 0.6,
         defaultUnit: 'pieces',
-        category: 'protein',
-        createdAt: new Date()
+        category: 'protein'
       },
       {
         name: 'Spaghetti',
@@ -82,8 +77,7 @@ export default defineEventHandler(async (event) => {
         proteinPerUnit: 0.05,
         carbsPerUnit: 0.25,
         defaultUnit: 'grams',
-        category: 'grain',
-        createdAt: new Date()
+        category: 'grain'
       },
       {
         name: 'Parmesan Cheese',
@@ -93,8 +87,7 @@ export default defineEventHandler(async (event) => {
         proteinPerUnit: 0.38,
         carbsPerUnit: 0.04,
         defaultUnit: 'grams',
-        category: 'dairy',
-        createdAt: new Date()
+        category: 'dairy'
       },
       {
         name: 'Pancetta',
@@ -104,8 +97,7 @@ export default defineEventHandler(async (event) => {
         proteinPerUnit: 0.21,
         carbsPerUnit: 0,
         defaultUnit: 'grams',
-        category: 'protein',
-        createdAt: new Date()
+        category: 'protein'
       },
       {
         name: 'Quinoa',
@@ -115,8 +107,7 @@ export default defineEventHandler(async (event) => {
         proteinPerUnit: 0.044,
         carbsPerUnit: 0.22,
         defaultUnit: 'grams',
-        category: 'grain',
-        createdAt: new Date()
+        category: 'grain'
       },
       {
         name: 'Salmon Fillet',
@@ -126,8 +117,7 @@ export default defineEventHandler(async (event) => {
         proteinPerUnit: 0.25,
         carbsPerUnit: 0,
         defaultUnit: 'grams',
-        category: 'protein',
-        createdAt: new Date()
+        category: 'protein'
       }
     ]
     
@@ -146,9 +136,7 @@ export default defineEventHandler(async (event) => {
         followers: [],
         following: [],
         createdRecipes: [],
-        favRecipes: [],
-        createdAt: new Date(),
-        updatedAt: new Date()
+        favRecipes: []
       },
       {
         email: 'sarah.green@example.com',
@@ -158,9 +146,7 @@ export default defineEventHandler(async (event) => {
         followers: [],
         following: [],
         createdRecipes: [],
-        favRecipes: [],
-        createdAt: new Date(),
-        updatedAt: new Date()
+        favRecipes: []
       },
       {
         email: 'baker.betty@example.com',
@@ -170,9 +156,7 @@ export default defineEventHandler(async (event) => {
         followers: [],
         following: [],
         createdRecipes: [],
-        favRecipes: [],
-        createdAt: new Date(),
-        updatedAt: new Date()
+        favRecipes: []
       }
     ]
     

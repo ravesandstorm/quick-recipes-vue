@@ -1,5 +1,13 @@
 <template>
   <div v-if="recipe" class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Success Message -->
+    <div
+      v-if="showSuccessMessage"
+      class="fixed top-4 right-4 z-50 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg animate-fade-in"
+    >
+      {{ successMessage }}
+    </div>
+
     <!-- Navigation Buttons -->
     <div class="fixed right-6 top-1/2 transform -translate-y-1/2 z-40 space-y-2">
       <button
@@ -73,19 +81,62 @@
           </div>
         </div>
         
-        <!-- Favorite Button -->
+        <!-- Rating and Favorite Actions -->
         <div class="flex items-center space-x-4">
+          <!-- Rating Section -->
+          <div v-if="user" class="flex items-center space-x-2 bg-white p-3 rounded-lg border border-gray-200">
+            <span class="text-sm text-gray-600 font-medium">Your Rating:</span>
+            <div class="flex items-center space-x-1">
+              <button
+                v-for="star in 5"
+                :key="star"
+                @click="submitRating(star)"
+                :disabled="ratingLoading"
+                class="w-6 h-6 transition-all duration-200 hover:scale-110 disabled:opacity-50"
+                :class="star <= (userRating || 0) ? 'text-yellow-400' : 'text-gray-300 hover:text-yellow-300'"
+                :title="`Rate ${star} star${star > 1 ? 's' : ''}`"
+              >
+                <svg class="w-full h-full" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+              </button>
+            </div>
+            <span v-if="userRating" class="text-sm text-gray-500">
+              ({{ userRating }}/5)
+            </span>
+          </div>
+
+          <!-- Login prompt for rating -->
+          <div v-else class="flex items-center space-x-2 bg-gray-50 p-3 rounded-lg border border-gray-200">
+            <span class="text-sm text-gray-500">
+              <NuxtLink to="/auth/login" class="text-blue-600 hover:text-blue-700 font-medium">
+                Sign in
+              </NuxtLink>
+              to rate this recipe
+            </span>
+          </div>
+
+          <!-- Favorite Button -->
           <button
             v-if="user"
             @click="toggleFavorite"
-            class="flex items-center space-x-2 px-4 py-2 rounded-lg border transition-all duration-200"
+            :disabled="favoriteLoading"
+            class="flex items-center space-x-2 px-4 py-2 rounded-lg border transition-all duration-200 disabled:opacity-50"
             :class="isFavorited ? 'bg-red-50 border-red-200 text-red-600' : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'"
           >
             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
               <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
             </svg>
-            <span>{{ recipe.favoriteCount }}</span>
+            <span>{{ favoriteLoading ? '...' : (recipe?.favoriteCount || 0) }}</span>
           </button>
+
+          <!-- Login prompt for favorites -->
+          <div v-else class="flex items-center space-x-2 px-4 py-2 rounded-lg border border-gray-200 bg-gray-50">
+            <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+            </svg>
+            <span class="text-sm text-gray-500">{{ recipe?.favoriteCount || 0 }}</span>
+          </div>
           
           <!-- Creator Info -->
           <NuxtLink
@@ -202,16 +253,61 @@
 </template>
 
 <script setup lang="ts">
-import type { Recipe } from '~/types'
+import type { Recipe } from '../../../types'
 
 const route = useRoute()
 const recipeId = route.params.id as string
 
-// Mock user for now
-const user = ref(null)
+// Get user authentication
+const user = ref<{ id: string } | null>(null)
 const isFavorited = ref(false)
+const userRating = ref<number | null>(null)
+const favoriteLoading = ref(false)
+const ratingLoading = ref(false)
+const showSuccessMessage = ref(false)
+const successMessage = ref('')
 
-const { data: recipe, pending } = await useFetch<{success: boolean, data: Recipe}>(`/api/recipes/${recipeId}`)
+// Initialize user data and check favorites/ratings
+onMounted(async () => {
+  try {
+    const localData = localStorage.getItem('user')
+    user.value = localData ? JSON.parse(localData) : null
+
+    // Check if user has favorited this recipe and get their rating
+    if (user.value && recipe.value) {
+      await checkUserInteractions()
+    }
+  } catch (error) {
+    console.error('Error reading user data from localStorage:', error)
+    user.value = null
+  }
+})
+
+const checkUserInteractions = async () => {
+  if (!user.value) return
+
+  try {
+    // Check if recipe is favorited (we'll need to create this endpoint)
+    const { data: userFavorites } = await $fetch<{success: boolean, data: string[]}>(`/api/users/${user.value.id}/favorites`)
+    isFavorited.value = userFavorites.includes(recipeId)
+
+    // Get user's rating for this recipe (we'll need to create this endpoint)
+    try {
+      const { data: ratingData } = await $fetch<{success: boolean, data: {rating: number}}>(`/api/recipes/${recipeId}/user-rating?userId=${user.value.id}`)
+      userRating.value = ratingData.rating
+    } catch (error) {
+      // User hasn't rated this recipe yet
+      userRating.value = null
+    }
+  } catch (error) {
+    console.error('Error checking user interactions:', error)
+  }
+}
+
+const { data: recipeResponse, pending } = await useFetch<{success: boolean, data: Recipe}>(`/api/recipes/${recipeId}`)
+
+// Extract the actual recipe data
+const recipe = computed(() => recipeResponse.value?.data)
 
 const scrollToSection = (sectionId: string) => {
   const element = document.getElementById(sectionId)
@@ -221,21 +317,63 @@ const scrollToSection = (sectionId: string) => {
 }
 
 const toggleFavorite = async () => {
-  if (!user.value || !recipe.value?.data) return
-  
+  if (!user.value || !recipe.value) return
+
   try {
-    isFavorited.value = !isFavorited.value
-    await $fetch(`/api/recipes/${recipeId}/favorite`, {
-      method: 'POST'
+    favoriteLoading.value = true
+    const { data } = await $fetch<{success: boolean, data: {isFavorited: boolean, favoriteCount: number}}>(`/api/recipes/${recipeId}/favorite`, {
+      method: 'POST',
+      body: { userId: user.value.id }
     })
-    
-    // Update favorite count
-    if (recipe.value.data) {
-      recipe.value.data.favoriteCount += isFavorited.value ? 1 : -1
+
+    isFavorited.value = data.isFavorited
+    // Update the recipe's favorite count
+    if (recipe.value) {
+      recipe.value.favoriteCount = data.favoriteCount
     }
+
+    // Show success message
+    showSuccessMessage.value = true
+    successMessage.value = data.isFavorited ? 'Added to favorites!' : 'Removed from favorites!'
+    setTimeout(() => {
+      showSuccessMessage.value = false
+    }, 3000)
   } catch (error) {
-    isFavorited.value = !isFavorited.value
     console.error('Error toggling favorite:', error)
+  } finally {
+    favoriteLoading.value = false
+  }
+}
+
+const submitRating = async (rating: number) => {
+  if (!user.value || !recipe.value || ratingLoading.value) return
+
+  try {
+    ratingLoading.value = true
+    const { data } = await $fetch<{success: boolean, data: {userRating: number, averageRating: number, totalRatings: number}}>(`/api/recipes/${recipeId}/rating`, {
+      method: 'POST',
+      body: {
+        userId: user.value.id,
+        rating: rating
+      }
+    })
+
+    userRating.value = data.userRating
+    // Update the recipe's average rating
+    if (recipe.value) {
+      recipe.value.rating = data.averageRating
+    }
+
+    // Show success message
+    showSuccessMessage.value = true
+    successMessage.value = `Rated ${rating} star${rating > 1 ? 's' : ''}!`
+    setTimeout(() => {
+      showSuccessMessage.value = false
+    }, 3000)
+  } catch (error) {
+    console.error('Error submitting rating:', error)
+  } finally {
+    ratingLoading.value = false
   }
 }
 
@@ -255,6 +393,23 @@ const formatDate = (date: string | Date) => {
 
 // Set page title
 useHead({
-  title: recipe.value?.data?.title ? `${recipe.value.data.title} - Quick Recipes` : 'Recipe - Quick Recipes'
+  title: recipe.value?.title ? `${recipe.value.title} - Quick Recipes` : 'Recipe - Quick Recipes'
 })
 </script>
+
+<style scoped>
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+</style>

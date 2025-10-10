@@ -92,7 +92,8 @@
 </template>
 
 <script setup lang="ts">
-const { signIn } = useSimpleAuth()
+// const { signIn } = useSimpleAuth()
+import type { response } from '../../../types'
 
 definePageMeta({
   auth: false,
@@ -128,16 +129,18 @@ const signInWithCredentials = async () => {
   error.value = ''
 
   try {
-    const result = await signIn('credentials', {
-      email: form.email,
-      password: form.password
+    const response: response = await $fetch('/api/auth/login', {
+      method: 'POST',
+      body: {
+        email: form.email,
+        password: form.password
+      }
     })
-
-    if (result.error) {
-      error.value = result.error
-    } else {
-      await navigateTo('/')
-    }
+    // Save user to localStorage
+    localStorage.setItem('user', JSON.stringify(response.user))
+    // Redirect to dashboard
+    await navigateTo('/')
+    
   } catch (err) {
     error.value = 'Failed to sign in'
     console.error('Credentials sign in error:', err)

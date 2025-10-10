@@ -29,9 +29,9 @@ export default defineEventHandler(async (event) => {
     return {
       success: true,
       data: {
-        totalRecipes: 1247,
-        totalUsers: 3892,
-        totalIngredients: 456
+        totalRecipes: 1,
+        totalUsers: 2,
+        totalIngredients: 3
       }
     }
   }

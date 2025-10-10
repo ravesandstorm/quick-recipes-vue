@@ -72,7 +72,7 @@
 </template>
 
 <script setup lang="ts">
-import type { RecipeIngredient, Ingredient } from '~/types'
+import type { RecipeIngredient, Ingredient } from '../../types'
 
 interface Props {
   modelValue: RecipeIngredient
