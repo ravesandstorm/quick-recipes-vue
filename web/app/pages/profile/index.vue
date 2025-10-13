@@ -241,8 +241,10 @@ const editMode = ref(false)
 const updating = ref(false)
 const activeTab = ref('recipes')
 
-const myRecipes = ref<Recipe[]>([])
-const favoriteRecipes = ref<Recipe[]>([])
+// load recipes from /api/users/:id/recipes
+const myRecipes = await $fetch<Recipe[]>(`/api/users/${authData.value?.id}/recipes`) || []
+// load recipes from /api/users/:id/favorites
+const favoriteRecipes = await $fetch<Recipe[]>(`/api/users/${authData.value?.id}/favorites`) || []
 
 const stats = ref({
   recipesCount: 0,

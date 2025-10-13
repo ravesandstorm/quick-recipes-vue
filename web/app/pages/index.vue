@@ -96,7 +96,7 @@
       <div v-else class="text-center py-12">
         <div class="text-gray-500 mb-4">No recipes found</div>
         <NuxtLink
-          v-if="data?.user"
+          v-if="user"
           to="/recipes/create"
           class="btn-primary"
         >
@@ -129,7 +129,7 @@
     </div>
 
     <!-- Call to Action -->
-    <div v-if="!data?.user" class="card bg-gradient-to-r from-blue-500 to-purple-600 text-white text-center">
+    <div v-if="!user" class="card bg-gradient-to-r from-blue-500 to-purple-600 text-white text-center">
       <h3 class="text-2xl font-bold mb-4">Ready to Start Cooking?</h3>
       <p class="text-blue-100 mb-6">Join our community and start sharing your favorite recipes</p>
       <div class="space-x-4">
@@ -159,7 +159,7 @@ interface Recipe {
   createdAt: Date
 }
 
-const { user } = useSimpleAuth()
+const { user } = useLocalData()
 
 const loading = ref(true)
 const recipes = ref<Recipe[]>([])

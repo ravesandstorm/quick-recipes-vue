@@ -92,8 +92,8 @@
 </template>
 
 <script setup lang="ts">
-// const { signIn } = useSimpleAuth()
-import type { response } from '../../../types'
+// const { signIn } = useLocalData() // composable for local not used directly, verification needed before updating
+import type { response, Error } from '../../../types'
 
 definePageMeta({
   auth: false,
@@ -141,8 +141,8 @@ const signInWithCredentials = async () => {
     // Redirect to dashboard
     await navigateTo('/')
     
-  } catch (err) {
-    error.value = 'Failed to sign in'
+  } catch (err: unknown) {
+    error.value = (err as Error)?.statusMessage || 'Failed to sign in'
     console.error('Credentials sign in error:', err)
   } finally {
     loading.value = false

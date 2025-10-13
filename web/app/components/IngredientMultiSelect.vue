@@ -68,7 +68,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Ingredient } from '~/types'
+import type { Ingredient } from '../../types'
 
 interface Props {
   modelValue: string[]

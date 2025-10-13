@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb'
 import { connectToDatabase, getCollection } from '../../../utils/db'
-import type { Recipe, Error } from '../../../../types'
+import type { Recipe, Error, User } from '../../../../types'
 
 export default defineEventHandler(async (event) => {
   try {
@@ -18,7 +18,7 @@ export default defineEventHandler(async (event) => {
     const users = getCollection('users')
     
     // First verify the user exists and get their favorite recipe IDs
-    const user = await users.findOne({ _id: new ObjectId(userId) })
+    const user = await users.findOne({ _id: ObjectId.createFromHexString(userId) }) as User | null
     if (!user) {
       throw createError({
         statusCode: 404,
@@ -39,7 +39,7 @@ export default defineEventHandler(async (event) => {
     // Convert string IDs to ObjectIds for MongoDB query
     const objectIds = favoriteRecipeIds.map(id => {
       try {
-        return new ObjectId(id)
+        return ObjectId.createFromHexString(id)
       } catch (error) {
         console.warn(`Invalid ObjectId: ${id}`)
         return null

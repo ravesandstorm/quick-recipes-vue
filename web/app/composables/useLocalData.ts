@@ -1,7 +1,7 @@
 import type { AuthUser } from '../../types'
 
 // Simple auth composable for demo purposes
-export const useSimpleAuth = () => {
+export const useLocalData = () => {
   const user = ref<AuthUser | null>(null)
   const status = ref('loading')
 

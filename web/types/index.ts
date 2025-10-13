@@ -15,9 +15,19 @@ export interface User {
   favRecipes: string[] // Array of recipe IDs
 }
 
+export interface UserProfile {
+  id: string
+  name: string
+  bio?: string
+  avatar?: string
+  followersCount: number
+  followingCount: number
+  recipesCount: number
+  isFollowing?: boolean
+}
+
 export interface Recipe {
   _id?: ObjectId
-  id?: string
   title: string
   description: string
   calories: number
@@ -28,8 +38,8 @@ export interface Recipe {
   favoriteCount: number
   rating?: number
   difficultyRating?: number
-  ingredientIDs: string[] // Array of ingredient IDs with quantities
-  ingredients: RecipeIngredient[] // Populated ingredient data
+  ingredientIDs: string[] // Array of ingredient IDs for searching
+  ingredients: RecipeIngredient[] // Populated ingredient data for display and calculations
   createdAt: Date
   updatedAt: Date
 }
@@ -95,17 +105,6 @@ export interface RecipeFormData {
   instructions: string[]
   ingredients: RecipeIngredient[]
   difficultyRating?: number
-}
-
-export interface UserProfile {
-  id: string
-  name: string
-  bio?: string
-  avatar?: string
-  followersCount: number
-  followingCount: number
-  recipesCount: number
-  isFollowing?: boolean
 }
 
 export interface Error {

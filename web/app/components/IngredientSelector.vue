@@ -1,5 +1,5 @@
 <template>
-  <div class="space-y-3">
+  <div class="space-y-3" ref="inputField">
     <!-- Ingredient Search -->
     <div class="relative">
       <input
@@ -73,6 +73,7 @@
 
 <script setup lang="ts">
 import type { RecipeIngredient, Ingredient } from '../../types'
+import { onClickOutside } from '#imports'
 
 interface Props {
   modelValue: RecipeIngredient
@@ -89,6 +90,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<Emits>()
 
+const inputFieldRef = useTemplateRef('inputField')
 const searchQuery = ref('')
 const showSuggestions = ref(false)
 const suggestions = ref<Ingredient[]>([])
@@ -158,7 +160,7 @@ onMounted(() => {
 })
 
 // Close suggestions when clicking outside
-onClickOutside(templateRef, () => {
+onClickOutside(inputFieldRef, () => {
   showSuggestions.value = false
 })
 </script>
