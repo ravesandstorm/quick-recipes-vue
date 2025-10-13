@@ -30,6 +30,8 @@ export interface Recipe {
   difficultyRating?: number
   ingredientIDs: string[] // Array of ingredient IDs with quantities
   ingredients: RecipeIngredient[] // Populated ingredient data
+  isGlutenFree: boolean
+  isLactoseFree: boolean
   createdAt: Date
   updatedAt: Date
 }
@@ -95,6 +97,8 @@ export interface RecipeFormData {
   instructions: string[]
   ingredients: RecipeIngredient[]
   difficultyRating?: number
+  isGlutenFree: boolean
+  isLactoseFree: boolean
 }
 
 export interface UserProfile {

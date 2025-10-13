@@ -132,7 +132,37 @@
           </button>
         </div>
       </div>
-      
+
+      <!-- Dietary Restrictions -->
+      <div class="card">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Dietary Information</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <label class="flex items-center space-x-3 cursor-pointer">
+            <input
+              v-model="form.isGlutenFree"
+              type="checkbox"
+              class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+            />
+            <div class="flex items-center space-x-2">
+              <span class="text-sm font-medium text-gray-700">Gluten-Free</span>
+              <span class="text-lg">🌾</span>
+            </div>
+          </label>
+
+          <label class="flex items-center space-x-3 cursor-pointer">
+            <input
+              v-model="form.isLactoseFree"
+              type="checkbox"
+              class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+            />
+            <div class="flex items-center space-x-2">
+              <span class="text-sm font-medium text-gray-700">Lactose-Free</span>
+              <span class="text-lg">🥛</span>
+            </div>
+          </label>
+        </div>
+      </div>
+
       <!-- Calculated Nutrition -->
       <div class="card bg-blue-50 border-blue-200">
         <h2 class="text-xl font-semibold text-gray-900 mb-6">Estimated Nutrition</h2>
@@ -181,7 +211,7 @@
 </template>
 
 <script setup lang="ts">
-import type { RecipeFormData, RecipeIngredient } from '~/types'
+import type { RecipeFormData } from '../../../types'
 
 definePageMeta({
   middleware: 'auth'
@@ -192,7 +222,9 @@ const form = reactive<RecipeFormData>({
   description: '',
   instructions: [''],
   ingredients: [],
-  difficultyRating: undefined
+  difficultyRating: undefined,
+  isGlutenFree: false,
+  isLactoseFree: false
 })
 
 const submitting = ref(false)
@@ -262,11 +294,9 @@ const submitRecipe = async () => {
   submitting.value = true
 
   try {
-    // Get user data from localStorage
-    const localData = localStorage.getItem('user')
-    const authData = localData ? JSON.parse(localData) : null
+    const { user } = useSimpleAuth()
 
-    if (!authData?.id) {
+    if (!user.value?.id) {
       throw new Error('User not authenticated')
     }
 
@@ -275,7 +305,7 @@ const submitRecipe = async () => {
       body: {
         ...form,
         ...calculatedNutrition.value,
-        userId: authData.id
+        userId: user.value.id
       }
     })
     

@@ -218,21 +218,7 @@ definePageMeta({
   middleware: 'auth'
 })
 
-// get authData from localStore (client-side only)
-const authData = ref<{ id: string } | null>(null)
-
-// Initialize auth data on client side
-const initializeAuth = () => {
-  if (process.client) {
-    try {
-      const localData = localStorage.getItem('user')
-      authData.value = localData ? JSON.parse(localData) : null
-    } catch (error) {
-      console.error('Error reading user data from localStorage:', error)
-      authData.value = null
-    }
-  }
-}
+const { user: authUser } = useSimpleAuth()
 
 const user = ref<User | null>(null)
 const loading = ref(false)
@@ -259,11 +245,11 @@ const fetchProfile = async () => {
   try {
     pending.value = true
 
-    if (!authData.value?.id) {
+    if (!authUser.value?.id) {
       return
     }
 
-    const { data } = await $fetch(`/api/users/${authData.value.id}`)
+    const { data } = await $fetch(`/api/users/${authUser.value.id}`) as { success: boolean, data: User }
     user.value = data
 
     // Update edit form
@@ -334,13 +320,10 @@ watch(activeTab, () => {
 })
 
 onMounted(async () => {
-  // Initialize auth data first
-  initializeAuth()
-
-  // Wait for auth data to be available
+  // Wait for auth to be available
   await nextTick()
 
-  if (authData.value) {
+  if (authUser.value) {
     await fetchProfile()
     if (user.value) {
       await fetchRecipes()

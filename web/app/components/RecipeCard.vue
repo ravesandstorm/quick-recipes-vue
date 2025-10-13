@@ -4,7 +4,7 @@
     <div class="h-48 bg-gradient-to-br from-gray-200 to-gray-300 rounded-t-xl flex items-center justify-center relative overflow-hidden">
       <!-- Placeholder for recipe image -->
       <div class="text-6xl opacity-50">🍽️</div>
-      
+
       <!-- Favorite Button -->
       <button
         v-if="user"
@@ -16,10 +16,22 @@
           <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
         </svg>
       </button>
-      
+
       <!-- Difficulty Badge -->
       <div v-if="recipe.difficultyRating" class="absolute top-3 left-3 px-2 py-1 bg-white/80 backdrop-blur-sm rounded-full text-xs font-medium">
         {{ getDifficultyText(recipe.difficultyRating) }}
+      </div>
+
+      <!-- Dietary Restriction Badges -->
+      <div class="absolute bottom-3 left-3 flex space-x-1">
+        <span v-if="recipe.isGlutenFree" class="px-2 py-1 bg-green-600 text-white text-xs font-medium rounded-full flex items-center space-x-1">
+          <span>🌾</span>
+          <span>GF</span>
+        </span>
+        <span v-if="recipe.isLactoseFree" class="px-2 py-1 bg-blue-600 text-white text-xs font-medium rounded-full flex items-center space-x-1">
+          <span>🥛</span>
+          <span>LF</span>
+        </span>
       </div>
     </div>
     
@@ -69,15 +81,26 @@
       
       <!-- Creator Info -->
       <div class="flex items-center justify-between">
-        <div class="flex items-center space-x-2">
+        <NuxtLink
+          v-if="recipe.createdByID"
+          :to="`/users/${recipe.createdByID}`"
+          @click.stop
+          class="flex items-center space-x-2 hover:bg-gray-50 rounded-lg p-1 -m-1 transition-colors"
+        >
           <div class="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
             <span class="text-white text-xs font-medium">
               {{ getCreatorInitial() }}
             </span>
           </div>
-          <span class="text-sm text-gray-600">{{ recipe.createdBy || 'Anonymous' }}</span>
+          <span class="text-sm text-gray-600 hover:text-blue-600 transition-colors">{{ recipe.createdBy || 'Anonymous' }}</span>
+        </NuxtLink>
+        <div v-else class="flex items-center space-x-2">
+          <div class="w-6 h-6 bg-gray-400 rounded-full flex items-center justify-center">
+            <span class="text-white text-xs font-medium">?</span>
+          </div>
+          <span class="text-sm text-gray-600">Anonymous</span>
         </div>
-        
+
         <div class="flex items-center space-x-1 text-sm text-gray-500">
           <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
             <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
@@ -98,8 +121,7 @@ interface Props {
 
 const props = defineProps<Props>()
 
-// Mock user for now - will be replaced with actual auth
-const user = ref(null) // This should come from auth
+const { user } = useSimpleAuth()
 const isFavorited = ref(false)
 
 const goToRecipe = () => {
@@ -108,13 +130,22 @@ const goToRecipe = () => {
 
 const toggleFavorite = async () => {
   if (!user.value) return
-  
+
   try {
     isFavorited.value = !isFavorited.value
+
     // API call to toggle favorite
-    await $fetch(`/api/recipes/${props.recipe.id}/favorite`, {
-      method: 'POST' as const
-    })
+    const { data } = await $fetch(`/api/recipes/${props.recipe.id}/favorite`, {
+      method: 'POST',
+      body: { userId: user.value.id }
+    }) as { success: boolean, data: { isFavorited: boolean, favoriteCount: number } }
+
+    // Update favorite count
+    if (props.recipe.favoriteCount !== undefined) {
+      props.recipe.favoriteCount = data.favoriteCount
+    }
+
+    isFavorited.value = data.isFavorited
   } catch (error) {
     // Revert on error
     isFavorited.value = !isFavorited.value

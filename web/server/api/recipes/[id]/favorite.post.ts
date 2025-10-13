@@ -43,15 +43,15 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    const favorites = user.favoriteRecipes || []
+    const favorites = user.favRecipes || []
     const isFavorited = favorites.includes(recipeId)
 
     if (isFavorited) {
       // Remove from favorites
       await users.updateOne(
         { _id: new ObjectId(userId) },
-        { 
-          $pull: { favoriteRecipes: recipeId },
+        {
+          $pull: { favRecipes: recipeId },
           $set: { updatedAt: new Date() }
         }
       )
@@ -68,8 +68,8 @@ export default defineEventHandler(async (event) => {
       // Add to favorites
       await users.updateOne(
         { _id: new ObjectId(userId) },
-        { 
-          $addToSet: { favoriteRecipes: recipeId },
+        {
+          $addToSet: { favRecipes: recipeId },
           $set: { updatedAt: new Date() }
         }
       )

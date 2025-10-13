@@ -45,9 +45,15 @@ export default defineEventHandler(async (event) => {
       if (query.maxCarbs) matchStage.carbs.$lte = parseFloat(query.maxCarbs.toString())
     }
     
-    // Ingredient filters
+    // Ingredient filters - exact match
     if (query.ingredients && query.ingredients.length > 0) {
-      matchStage.ingredientIDs = { $in: query.ingredients }
+      // Convert ingredients array to array if it's a string
+      const ingredientIds = Array.isArray(query.ingredients) ? query.ingredients : [query.ingredients]
+
+      // Filter recipes that contain ALL specified ingredients (exact match)
+      matchStage.ingredientIDs = {
+        $all: ingredientIds
+      }
     }
     
     if (Object.keys(matchStage).length > 0) {
@@ -120,6 +126,9 @@ export default defineEventHandler(async (event) => {
         difficultyRating: 1,
         favoriteCount: 1,
         createdBy: 1,
+        createdByID: 1,
+        isGlutenFree: 1,
+        isLactoseFree: 1,
         createdAt: 1
       }
     })

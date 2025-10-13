@@ -14,15 +14,15 @@
             </NuxtLink>
           </div>
           
-          <!-- Search Bar -->
-          <div class="flex-1 max-w-lg mx-8">
-            <div class="relative">
+          <!-- Search Bar - Hidden on mobile -->
+          <div class="hidden md:flex flex-1 max-w-lg mx-8">
+            <div class="relative w-full">
               <input
                 v-model="searchQuery"
                 @keyup.enter="performSearch"
                 type="text"
                 placeholder="Search recipes..."
-                class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                class="w-full pl-10 pr-20 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
               <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <!-- Search Icon -->
@@ -31,12 +31,6 @@
                 </svg>
               </div>
               <button
-                @click="performSearch"
-                class="absolute inset-y-0 right-12 pr-3 flex items-center"
-              >
-                <span class="text-blue-600 hover:text-blue-700 text-sm font-medium">Search</span>
-              </button>
-              <button
                 @click="goToAdvancedSearch"
                 class="absolute inset-y-0 right-0 pr-3 flex items-center"
               >
@@ -44,17 +38,35 @@
               </button>
             </div>
           </div>
+
+          <!-- Mobile Search Button -->
+          <button
+            @click="goToAdvancedSearch"
+            class="md:hidden p-2 text-gray-400 hover:text-gray-600"
+            title="Search"
+          >
+            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </button>
           
           <!-- User Menu -->
           <div class="flex items-center space-x-4">
-            <!-- Create Recipe Button (only for logged in users) -->
-            <NuxtLink
-              v-if="user"
-              to="/recipes/create"
-              class="btn-primary"
-            >
-              Create Recipe
-            </NuxtLink>
+            <!-- Navigation Links (only for logged in users) -->
+            <div v-if="user" class="hidden sm:flex items-center space-x-4">
+              <NuxtLink
+                to="/my-recipes"
+                class="text-gray-700 hover:text-blue-600 text-sm font-medium transition-colors"
+              >
+                My Recipes
+              </NuxtLink>
+              <NuxtLink
+                to="/recipes/create"
+                class="btn-primary text-sm"
+              >
+                Create Recipe
+              </NuxtLink>
+            </div>
             
             <!-- User Profile Dropdown -->
             <div class="relative" ref="dropdownRef">
@@ -90,14 +102,28 @@
                     class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
                     @click="closeDropdown"
                   >
-                    View Profile
+                    Edit Profile
                   </NuxtLink>
                   <NuxtLink
-                    to="/recipes/my-recipes"
+                    :to="`/users/${user.id}`"
+                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                    @click="closeDropdown"
+                  >
+                    View My Profile
+                  </NuxtLink>
+                  <NuxtLink
+                    to="/my-recipes"
                     class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
                     @click="closeDropdown"
                   >
                     My Recipes
+                  </NuxtLink>
+                  <NuxtLink
+                    to="/recipes/create"
+                    class="sm:hidden block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                    @click="closeDropdown"
+                  >
+                    Create Recipe
                   </NuxtLink>
                   <hr class="my-1 border-gray-200">
                   <button

@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs'
 import { connectToDatabase, getCollection } from '../../utils/db'
-import type { AuthUser, LoginCredentials, Error } from '../../../types'
+import { createToken, setAuthCookie } from '../../utils/auth'
+import type { LoginCredentials } from '../../../types'
 
 export default defineEventHandler(async (event) => {
     try {
@@ -41,6 +42,16 @@ export default defineEventHandler(async (event) => {
             })
         }
 
+        // Create JOSE token
+        const token = await createToken({
+            userId: existingUser._id.toString(),
+            email: existingUser.email,
+            name: existingUser.name
+        })
+
+        // Set HTTP-only cookie
+        setAuthCookie(event, token)
+
         return {
             success: true,
             user: {
@@ -50,7 +61,7 @@ export default defineEventHandler(async (event) => {
             }
         }
     } catch (error: unknown) {
-        if ((error as Error).statusCode) {
+        if ((error as any).statusCode) {
             throw error
         }
 

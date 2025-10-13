@@ -104,6 +104,9 @@ export default defineEventHandler(async (event) => {
             favoriteCount: 1,
             ingredients: 1,
             createdBy: 1,
+            createdByID: 1,
+            isGlutenFree: 1,
+            isLactoseFree: 1,
             createdAt: 1,
             updatedAt: 1
           }

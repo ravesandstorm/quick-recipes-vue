@@ -46,6 +46,8 @@ export default defineEventHandler(async (event) => {
       difficultyRating: body.difficultyRating,
       ingredientIDs: body.ingredients.map(ing => ing.ingredientId),
       ingredients: body.ingredients,
+      isGlutenFree: body.isGlutenFree || false,
+      isLactoseFree: body.isLactoseFree || false,
       createdAt: new Date(),
       updatedAt: new Date()
     }

@@ -37,6 +37,9 @@ export default defineEventHandler(async (event) => {
             difficultyRating: 1,
             favoriteCount: 1,
             createdBy: 1,
+            createdByID: 1,
+            isGlutenFree: 1,
+            isLactoseFree: 1,
             createdAt: 1
           }
         },
