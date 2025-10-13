@@ -33,14 +33,13 @@ export default defineEventHandler(async (event) => {
         }
 
         // Compare password with stored hash
-        bcrypt.compare(body.password, existingUser.password).then((result) => {
-            if (!result) {
-                throw createError({
-                    statusCode: 401,
-                    statusMessage: 'Incorrect password'
-                })
-            }
-        })
+        const result = await bcrypt.compare(body.password, existingUser.password)
+        if (!result) {
+            throw createError({
+                statusCode: 401,
+                statusMessage: 'Incorrect password'
+            })
+        }
 
         return {
             success: true,

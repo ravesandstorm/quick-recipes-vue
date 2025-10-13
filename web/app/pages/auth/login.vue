@@ -93,7 +93,8 @@
 
 <script setup lang="ts">
 // const { signIn } = useSimpleAuth()
-import type { response } from '../../../types'
+import type { response, Error, AuthUser } from '../../../types'
+import { useRuntimeConfig } from '#app'
 
 definePageMeta({
   auth: false,
@@ -141,9 +142,9 @@ const signInWithCredentials = async () => {
     // Redirect to dashboard
     await navigateTo('/')
     
-  } catch (err) {
-    error.value = 'Failed to sign in'
-    console.error('Credentials sign in error:', err)
+  } catch (err: unknown) {
+    error.value = (err as Error)?.statusMessage || 'Failed to sign in'
+    console.error('Credentials sign in error:', (err as Error)?.statusMessage)
   } finally {
     loading.value = false
   }

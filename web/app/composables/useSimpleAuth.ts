@@ -1,6 +1,5 @@
 import type { AuthUser } from '../../types'
 
-// Simple auth composable for demo purposes
 export const useSimpleAuth = () => {
   const user = ref<AuthUser | null>(null)
   const status = ref('loading')
@@ -23,26 +22,6 @@ export const useSimpleAuth = () => {
     }
   }
 
-  // Sign in function
-  const signIn = async (provider: string, credentials?: any) => {
-    if (provider === 'credentials' && credentials) {
-      // Mock authentication
-      const mockUser = {
-        id: 'demo-user',
-        email: credentials.email,
-        name: credentials.email.split('@')[0]
-      }
-      
-      localStorage.setItem('user', JSON.stringify(mockUser))
-      user.value = mockUser
-      status.value = 'authenticated'
-      
-      return { error: null }
-    }
-    
-    return { error: 'Provider not supported' }
-  }
-
   // Sign out function
   const signOut = async () => {
     if (process.client) {
@@ -60,7 +39,6 @@ export const useSimpleAuth = () => {
   return {
     user: readonly(user),
     status: readonly(status),
-    signIn,
     signOut
   }
 }
