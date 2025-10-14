@@ -122,3 +122,11 @@ export interface response {
   error?: Error
   user?: AuthUser
 }
+
+export interface TokenPayload {
+  userId?: string
+  email?: string
+  name?: string
+  iat: number
+  exp: number
+}

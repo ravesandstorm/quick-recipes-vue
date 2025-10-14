@@ -94,6 +94,9 @@
 <script setup lang="ts">
 import type { Error } from '../../../types'
 
+const runtimeConfig = useRuntimeConfig()
+const googleClientId = runtimeConfig.public.googleClientId
+
 definePageMeta({
   auth: false,
   layout: false
@@ -140,7 +143,7 @@ const signInWithGoogle = async () => {
     // Google OAuth with client ID/secret
     if (typeof window !== 'undefined' && window.google) {
       window.google.accounts.id.initialize({
-        client_id: '{{ GOOGLE_CLIENT_ID }}', // Replace with actual Google Client ID
+        client_id: googleClientId,
         callback: handleGoogleResponse
       })
 

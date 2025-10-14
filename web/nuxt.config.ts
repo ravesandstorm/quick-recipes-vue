@@ -12,12 +12,12 @@ export default defineNuxtConfig({
   runtimeConfig: {
     // Private keys (only available on server-side)
     authSecret: process.env.NUXT_AUTH_SECRET,
-    googleClientId: process.env.GOOGLE_CLIENT_ID,
     googleClientSecret: process.env.GOOGLE_CLIENT_SECRET,
     mongodbUri: process.env.MONGODB_URI,
     // Public keys (exposed to client-side)
     public: {
-      authUrl: process.env.NUXT_AUTH_URL
+      authUrl: process.env.NUXT_AUTH_URL,
+      googleClientId: process.env.GOOGLE_CLIENT_ID
     }
   },
 

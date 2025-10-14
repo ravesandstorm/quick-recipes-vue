@@ -1,16 +1,9 @@
 import { SignJWT, jwtVerify } from 'jose'
+import type { TokenPayload } from '../../types'
 
-const secret = new TextEncoder().encode(
-  process.env.NUXT_AUTH_SECRET || 'your-super-secret-key-here-change-in-production'
-)
+const config = useRuntimeConfig()
 
-export interface TokenPayload {
-  userId: string
-  email: string
-  name: string
-  iat?: number
-  exp?: number
-}
+const secret = new TextEncoder().encode( config.authSecret )
 
 /**
  * Create a JOSE token with 48-hour expiration
@@ -18,7 +11,7 @@ export interface TokenPayload {
 export async function createToken(payload: Omit<TokenPayload, 'iat' | 'exp'>): Promise<string> {
   const token = await new SignJWT(payload)
     .setProtectedHeader({ alg: 'HS256' })
-    .setIssuedAt()
+    .setIssuedAt(Math.floor(Date.now() / 1000))
     .setExpirationTime('48h')
     .sign(secret)
   
@@ -46,7 +39,7 @@ export function setAuthCookie(event: any, token: string) {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
-    maxAge: 48 * 60 * 60, // 48 hours in seconds
+    maxAge: 2 * 24 * 60 * 60, // 48 hours in seconds
     path: '/'
   })
 }
@@ -79,5 +72,5 @@ export async function getAuthenticatedUser(event: any): Promise<TokenPayload | n
     return null
   }
   
-  return await verifyToken(token)
+  return await verifyToken(token) as TokenPayload
 }
