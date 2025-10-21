@@ -35,7 +35,7 @@ export async function verifyToken(token: string): Promise<TokenPayload | null> {
  * Set HTTP-only cookie with token
  */
 export function setAuthCookie(event: any, token: string) {
-  setCookie(event, 'auth-token', token, {
+  setCookie(event, 'qr-auth-token', token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
@@ -48,7 +48,7 @@ export function setAuthCookie(event: any, token: string) {
  * Clear authentication cookie
  */
 export function clearAuthCookie(event: any) {
-  deleteCookie(event, 'auth-token', {
+  deleteCookie(event, 'qr-auth-token', {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
@@ -60,7 +60,7 @@ export function clearAuthCookie(event: any) {
  * Get token from request cookies
  */
 export function getTokenFromCookies(event: any): string | undefined {
-  return getCookie(event, 'auth-token')
+  return getCookie(event, 'qr-auth-token')
 }
 
 /**

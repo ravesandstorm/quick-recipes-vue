@@ -11,6 +11,10 @@ export async function connectToDatabase(): Promise<Db> {
   const config = useRuntimeConfig()
   const uri = config.mongodbUri || 'mongodb://localhost:27017/quick-recipes'
 
+  if (!uri) {
+    throw new Error('MONGODB_URI is not defined in environment variables')
+  }
+
   try {
     client = new MongoClient(uri)
     await client.connect()
