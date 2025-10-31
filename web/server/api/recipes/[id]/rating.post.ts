@@ -3,16 +3,20 @@ import { connectToDatabase, getCollection } from '../../../utils/db'
 
 export default defineEventHandler(async (event) => {
   try {
-    const recipeId = getRouterParam(event, 'id')
-    const body = await readBody(event)
-    const { userId, rating } = body
+    // Get authenticated user from context (set by auth middleware)
+    const user = event.context.user
 
-    if (!userId) {
+    if (!user || !user.userId) {
       throw createError({
         statusCode: 401,
-        statusMessage: 'User ID is required'
+        statusMessage: 'Authentication required'
       })
     }
+
+    const recipeId = getRouterParam(event, 'id')
+    const body = await readBody(event)
+    const { rating } = body
+    const userId = user.userId
 
     if (!recipeId) {
       throw createError({

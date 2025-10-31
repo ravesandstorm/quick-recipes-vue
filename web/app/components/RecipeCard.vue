@@ -134,10 +134,9 @@ const toggleFavorite = async () => {
   try {
     isFavorited.value = !isFavorited.value
 
-    // API call to toggle favorite
+    // API call to toggle favorite (auth handled by server middleware via cookies)
     const { data } = await $fetch(`/api/recipes/${props.recipe.id}/favorite`, {
-      method: 'POST',
-      body: { userId: user.value.id }
+      method: 'POST'
     }) as { success: boolean, data: { isFavorited: boolean, favoriteCount: number } }
 
     // Update favorite count

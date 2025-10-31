@@ -4,22 +4,23 @@ import type { Recipe, RecipeFormData } from '../../../types'
 
 export default defineEventHandler(async (event) => {
   try {
+    // Get authenticated user from context (set by auth middleware)
+    const user = event.context.user
+
+    if (!user || !user.userId) {
+      throw createError({
+        statusCode: 401,
+        statusMessage: 'Authentication required'
+      })
+    }
+
     const body = await readBody(event) as RecipeFormData & {
       calories: number
       protein: number
       carbs: number
-      userId?: string
     }
 
-    // Get user ID from request body
-    const userId = body.userId
-
-    if (!userId) {
-      throw createError({
-        statusCode: 401,
-        statusMessage: 'User ID is required'
-      })
-    }
+    const userId = user.userId
     
     if (!body.title || !body.description || !body.instructions?.length || !body.ingredients?.length) {
       throw createError({

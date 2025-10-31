@@ -294,29 +294,30 @@ const submitRecipe = async () => {
   submitting.value = true
 
   try {
-    const { user } = useSimpleAuth()
+    console.log('Submitting recipe:', form)
+    console.log('Calculated nutrition:', calculatedNutrition.value)
 
-    if (!user.value?.id) {
-      throw new Error('User not authenticated')
-    }
-
-    const { data } = await $fetch('/api/recipes', {
+    // Authentication is handled by the server middleware via cookies
+    const response = await $fetch('/api/recipes', {
       method: 'POST',
+      credentials: 'include',
       body: {
         ...form,
-        ...calculatedNutrition.value,
-        userId: user.value.id
+        ...calculatedNutrition.value
       }
     })
-    
+
+    console.log('Recipe creation response:', response)
+
     // Clear draft
     localStorage.removeItem('recipe-draft')
-    
+
     // Redirect to recipe page
-    await navigateTo(`/recipes/${data.id}`)
-  } catch (error) {
+    await navigateTo(`/recipes/${response.data.id}`)
+  } catch (error: any) {
     console.error('Error creating recipe:', error)
-    // Show error message
+    console.error('Error details:', error?.data || error?.message)
+    alert(`Failed to create recipe: ${error?.data?.message || error?.message || 'Please try again.'}`)
   } finally {
     submitting.value = false
   }

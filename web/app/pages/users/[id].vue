@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
     <!-- Loading State -->
     <div v-if="loading" class="animate-pulse">
       <div class="card">
@@ -34,13 +34,22 @@
           <div class="flex-1 w-full">
             <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4">
               <div class="mb-4 sm:mb-0">
-                <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ userProfile.name }}</h1>
-                <p v-if="userProfile.bio" class="text-gray-600">{{ userProfile.bio }}</p>
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">{{ userProfile.name }}</h1>
+                <p v-if="userProfile.bio" class="text-gray-600 dark:text-gray-400">{{ userProfile.bio }}</p>
               </div>
-              
+
+              <!-- Edit Button (only show if own profile) -->
+              <button
+                v-if="isOwnProfile && !editMode"
+                @click="editMode = true"
+                class="px-6 py-2 rounded-lg font-medium transition-colors bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
+              >
+                Edit Profile
+              </button>
+
               <!-- Follow Button (only show if not own profile) -->
               <button
-                v-if="!isOwnProfile && currentUser"
+                v-else-if="!isOwnProfile && currentUser"
                 @click="toggleFollow"
                 :disabled="followLoading"
                 :class="[
@@ -53,6 +62,50 @@
                 <span v-if="followLoading">...</span>
                 <span v-else>{{ isFollowing ? 'Unfollow' : 'Follow' }}</span>
               </button>
+            </div>
+
+            <!-- Edit Form (only show if own profile and edit mode) -->
+            <div v-if="isOwnProfile && editMode" class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+              <form @submit.prevent="updateProfile" class="space-y-4">
+                <div>
+                  <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name</label>
+                  <input
+                    id="name"
+                    v-model="editForm.name"
+                    type="text"
+                    required
+                    class="input-field"
+                  />
+                </div>
+
+                <div>
+                  <label for="bio" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Bio</label>
+                  <textarea
+                    id="bio"
+                    v-model="editForm.bio"
+                    rows="3"
+                    class="input-field resize-none"
+                    placeholder="Tell us about yourself..."
+                  ></textarea>
+                </div>
+
+                <div class="flex justify-end space-x-4">
+                  <button
+                    type="button"
+                    @click="cancelEdit"
+                    class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    :disabled="updating"
+                    class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                  >
+                    {{ updating ? 'Saving...' : 'Save Changes' }}
+                  </button>
+                </div>
+              </form>
             </div>
 
             <!-- Stats -->
@@ -137,6 +190,8 @@ const userId = route.params.id as string
 const loading = ref(true)
 const recipesLoading = ref(true)
 const followLoading = ref(false)
+const editMode = ref(false)
+const updating = ref(false)
 const userProfile = ref<User | null>(null)
 const userRecipes = ref<Recipe[]>([])
 const isFollowing = ref(false)
@@ -145,6 +200,11 @@ const stats = ref({
   recipesCount: 0,
   followersCount: 0,
   followingCount: 0
+})
+
+const editForm = reactive({
+  name: '',
+  bio: ''
 })
 
 const isOwnProfile = computed(() => {
@@ -156,6 +216,12 @@ const fetchUserProfile = async () => {
     loading.value = true
     const { data } = await $fetch(`/api/users/${userId}`) as { success: boolean, data: User }
     userProfile.value = data
+
+    // Update edit form if own profile
+    if (isOwnProfile.value) {
+      editForm.name = data.name || ''
+      editForm.bio = data.bio || ''
+    }
 
     // Update stats
     stats.value = {
@@ -169,8 +235,12 @@ const fetchUserProfile = async () => {
       isFollowing.value = data.followers?.includes(currentUser.value.id) || false
     }
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching user profile:', error)
+    if (error?.statusCode === 404) {
+      // User not found, redirect to not found page
+      await navigateTo('/profile-not-found')
+    }
   } finally {
     loading.value = false
   }
@@ -193,7 +263,7 @@ const toggleFollow = async () => {
 
   try {
     followLoading.value = true
-    
+
     const { data } = await $fetch(`/api/users/${userId}/follow`, {
       method: 'POST',
       body: { userId: currentUser.value.id }
@@ -207,6 +277,35 @@ const toggleFollow = async () => {
   } finally {
     followLoading.value = false
   }
+}
+
+const updateProfile = async () => {
+  if (!userProfile.value) return
+
+  try {
+    updating.value = true
+
+    const { data } = await $fetch(`/api/users/${userId}`, {
+      method: 'PATCH',
+      body: editForm
+    }) as { success: boolean, data: User }
+
+    userProfile.value = { ...userProfile.value, ...data }
+    editMode.value = false
+
+  } catch (error) {
+    console.error('Error updating profile:', error)
+  } finally {
+    updating.value = false
+  }
+}
+
+const cancelEdit = () => {
+  if (userProfile.value) {
+    editForm.name = userProfile.value.name || ''
+    editForm.bio = userProfile.value.bio || ''
+  }
+  editMode.value = false
 }
 
 onMounted(async () => {

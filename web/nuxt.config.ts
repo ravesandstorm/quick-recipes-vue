@@ -9,6 +9,12 @@ export default defineNuxtConfig({
     '@vueuse/nuxt'
   ],
 
+  tailwindcss: {
+    config: {
+      darkMode: 'class'
+    }
+  },
+
   runtimeConfig: {
     // Private keys (only available on server-side)
     authSecret: process.env.NUXT_AUTH_SECRET,
@@ -24,5 +30,10 @@ export default defineNuxtConfig({
   // Make dashboard accessible without authentication
   ssr: true,
 
-  css: ['~/assets/main.css']
+  css: ['~/assets/main.css'],
+
+  app: {
+    pageTransition: { name: 'page', mode: 'out-in' },
+    layoutTransition: { name: 'layout', mode: 'out-in' }
+  }
 })

@@ -68,10 +68,20 @@ export default defineEventHandler(async (event) => {
             isLactoseFree: 1,
             createdAt: 1,
             updatedAt: 1,
-            createdBy: '$creator.name',
-            'creator.id': { $toString: '$creator._id' },
-            'creator.name': 1,
-            'creator.avatar': 1
+            createdBy: {
+              $ifNull: ['$creator.name', 'Deleted User']
+            },
+            'creator.id': {
+              $cond: {
+                if: { $ne: ['$creator', null] },
+                then: { $toString: '$creator._id' },
+                else: null
+              }
+            },
+            'creator.name': {
+              $ifNull: ['$creator.name', 'Deleted User']
+            },
+            'creator.avatar': '$creator.avatar'
           }
         }
       ])

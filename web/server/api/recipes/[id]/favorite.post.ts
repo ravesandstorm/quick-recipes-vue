@@ -3,16 +3,18 @@ import { connectToDatabase, getCollection } from '../../../utils/db'
 
 export default defineEventHandler(async (event) => {
   try {
-    const recipeId = getRouterParam(event, 'id')
-    const body = await readBody(event)
-    const userId = body.userId
+    // Get authenticated user from context (set by auth middleware)
+    const user = event.context.user
 
-    if (!userId) {
+    if (!user || !user.userId) {
       throw createError({
         statusCode: 401,
-        statusMessage: 'User ID is required'
+        statusMessage: 'Authentication required'
       })
     }
+
+    const recipeId = getRouterParam(event, 'id')
+    const userId = user.userId
 
     if (!recipeId) {
       throw createError({
@@ -35,15 +37,15 @@ export default defineEventHandler(async (event) => {
     }
 
     // Get user's current favorites
-    const user = await users.findOne({ _id: new ObjectId(userId) })
-    if (!user) {
+    const userDoc = await users.findOne({ _id: new ObjectId(userId) })
+    if (!userDoc) {
       throw createError({
         statusCode: 404,
         statusMessage: 'User not found'
       })
     }
 
-    const favorites = user.favRecipes || []
+    const favorites = userDoc.favRecipes || []
     const isFavorited = favorites.includes(recipeId)
 
     if (isFavorited) {
