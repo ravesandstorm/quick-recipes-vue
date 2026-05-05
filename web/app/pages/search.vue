@@ -5,11 +5,11 @@
       <h1 class="text-3xl font-bold text-gray-900 mb-4">Search Recipes</h1>
       
       <!-- Main Search Bar -->
-      <div class="flex space-x-4 mb-4">
+      <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 mb-4">
         <div class="flex-1 relative">
           <input
             v-model="searchQuery"
-            @keyup.enter="performSearch"
+            @keyup.enter="() => performSearch()"
             type="text"
             placeholder="Search for recipes..."
             class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg"
@@ -20,18 +20,20 @@
             </svg>
           </div>
         </div>
-        <button
-          @click="performSearch"
-          class="btn-primary px-8"
-        >
-          Search
-        </button>
-        <button
-          @click="showAdvanced = !showAdvanced"
-          class="btn-secondary"
-        >
-          Advanced
-        </button>
+        <div class="flex space-x-2 sm:space-x-4">
+          <button
+            @click="() => performSearch()"
+            class="btn-primary flex-1 sm:flex-none sm:px-8"
+          >
+            Search
+          </button>
+          <button
+            @click="showAdvanced = !showAdvanced"
+            class="btn-secondary flex-1 sm:flex-none"
+          >
+            Advanced
+          </button>
+        </div>
       </div>
       
       <!-- Advanced Filters -->
@@ -132,7 +134,7 @@
           <button @click="clearFilters" class="btn-secondary">
             Clear Filters
           </button>
-          <button @click="performSearch" class="btn-primary">
+          <button @click="() => performSearch()" class="btn-primary">
             Apply Filters
           </button>
         </div>
@@ -155,7 +157,7 @@
         <!-- Quick Sort -->
         <div class="flex items-center space-x-2">
           <span class="text-sm text-gray-600">Sort:</span>
-          <select v-model="quickSort" @change="performSearch" class="text-sm border border-gray-300 rounded px-2 py-1">
+          <select v-model="quickSort" @change="() => performSearch()" class="text-sm border border-gray-300 rounded px-2 py-1">
             <option value="relevance">Relevance</option>
             <option value="rating">Rating</option>
             <option value="favoriteCount">Popular</option>
@@ -200,7 +202,7 @@
       <!-- Load More -->
       <div v-if="recipes.length > 0 && hasMore" class="text-center mt-8">
         <button
-          @click="loadMore"
+          @click="loadMoreRecipes"
           :disabled="loading"
           class="btn-primary"
         >
@@ -216,7 +218,7 @@
         <button
           v-for="suggestion in searchSuggestions"
           :key="suggestion"
-          @click="searchQuery = suggestion; performSearch()"
+          @click="() => { searchQuery = suggestion; performSearch() }"
           class="card text-center hover:shadow-md transition-all duration-200 hover:scale-105"
         >
           <div class="text-sm font-medium text-gray-700">{{ suggestion }}</div>
@@ -287,17 +289,17 @@ const performSearch = async (loadMore = false) => {
       skip: (currentPage.value - 1) * 12
     }
     
-    const { data } = await $fetch('/api/recipes/search', {
+    const response = await $fetch('/api/recipes/search', {
       query: searchParams
-    })
-    
+    }) as { success: boolean, data: { recipes: Recipe[], total: number, page: number, totalPages: number } }
+
     if (loadMore) {
-      recipes.value.push(...(data.recipes || []))
+      recipes.value.push(...(response.data.recipes || []))
     } else {
-      recipes.value = data.recipes || []
+      recipes.value = response.data.recipes || []
     }
-    
-    totalResults.value = data.total || 0
+
+    totalResults.value = response.data.total || 0
     hasMore.value = recipes.value.length < totalResults.value
     
     // Update URL

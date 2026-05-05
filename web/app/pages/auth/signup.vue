@@ -121,12 +121,40 @@
 </template>
 
 <script setup lang="ts">
-import type { response, Error } from '../../../types'
+import type { Error } from '../../../types'
+
+const runtimeConfig = useRuntimeConfig()
+const googleClientId = runtimeConfig.public.googleClientId
 
 definePageMeta({
   auth: false,
   layout: false
 })
+
+// Add Google Sign-In script
+useHead({
+  script: [
+    {
+      src: 'https://accounts.google.com/gsi/client',
+      async: true,
+      defer: true
+    }
+  ]
+})
+
+// Extend window interface for Google Sign-In
+declare global {
+  interface Window {
+    google?: {
+      accounts: {
+        id: {
+          initialize: (config: any) => void
+          prompt: () => void
+        }
+      }
+    }
+  }
+}
 
 const form = reactive({
   name: '',
@@ -144,14 +172,62 @@ const signUpWithGoogle = async () => {
   error.value = ''
 
   try {
-    // Mock Google sign up for now
-    console.log('Google sign up clicked')
-    error.value = 'Google OAuth not configured yet. Please use email/password.'
+    // Google OAuth with client ID/secret
+    if (typeof window !== 'undefined' && window.google) {
+      window.google.accounts.id.initialize({
+        client_id: googleClientId,
+        callback: handleGoogleResponse
+      })
+
+      window.google.accounts.id.prompt()
+    } else {
+      error.value = 'Google Sign-In not available. Please use email/password.'
+    }
+
+    /* Alternative: Firebase Auth (commented out)
+    import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth'
+
+    const auth = getAuth()
+    const provider = new GoogleAuthProvider()
+
+    const result = await signInWithPopup(auth, provider)
+    const user = result.user
+
+    // Send Firebase user data to your backend
+    await $fetch('/api/auth/firebase', {
+      method: 'POST',
+      body: {
+        uid: user.uid,
+        email: user.email,
+        name: user.displayName,
+        avatar: user.photoURL
+      }
+    })
+
+    await navigateTo('/')
+    */
   } catch (err) {
     error.value = 'Failed to sign up with Google'
     console.error('Google sign up error:', err)
   } finally {
     loading.value = false
+  }
+}
+
+const handleGoogleResponse = async (response: any) => {
+  try {
+    await $fetch('/api/auth/google', {
+      method: 'POST',
+      body: {
+        credential: response.credential
+      }
+    })
+
+    // Redirect to dashboard
+    await navigateTo('/')
+  } catch (err) {
+    error.value = 'Failed to sign up with Google'
+    console.error('Google OAuth error:', err)
   }
 }
 
@@ -174,7 +250,7 @@ const signUpWithCredentials = async () => {
   }
 
   try {
-    const response: response = await $fetch('/api/auth/signup', {
+    await $fetch('/api/auth/signup', {
       method: 'POST',
       body: {
         name: form.name,
@@ -183,14 +259,12 @@ const signUpWithCredentials = async () => {
       }
     })
 
-    // Save user to localStorage
-    localStorage.setItem('user', JSON.stringify(response.user))
+    // Authentication is now handled via HTTP-only cookies
+    success.value = 'Account created successfully! Redirecting to dashboard...'
 
-    success.value = 'Account created successfully! Redirecting to login...'
-
-    // Wait a moment then redirect to login
+    // Wait a moment then redirect to dashboard
     setTimeout(async () => {
-      await navigateTo('/auth/login')
+      await navigateTo('/')
     }, 2000)
 
   } catch (err: unknown) {

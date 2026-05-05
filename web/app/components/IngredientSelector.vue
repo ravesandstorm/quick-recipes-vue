@@ -47,15 +47,13 @@
       </div>
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-1">Unit</label>
-        <select v-model="unit" class="input-field">
-          <option :value="selectedIngredient.defaultUnit">{{ selectedIngredient.defaultUnit }}</option>
-          <option v-if="selectedIngredient.defaultUnit !== 'grams'" value="grams">grams</option>
-          <option v-if="selectedIngredient.defaultUnit !== 'ml'" value="ml">ml</option>
-          <option v-if="selectedIngredient.defaultUnit !== 'pieces'" value="pieces">pieces</option>
-          <option value="cups">cups</option>
-          <option value="tbsp">tablespoons</option>
-          <option value="tsp">teaspoons</option>
-        </select>
+        <input
+          :value="selectedIngredient.defaultUnit"
+          type="text"
+          class="input-field bg-gray-100 cursor-not-allowed"
+          readonly
+          disabled
+        />
       </div>
     </div>
     

@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs'
 import { connectToDatabase, getCollection } from '../../utils/db'
-import type { AuthUser, LoginCredentials, Error } from '../../../types'
+import { createToken, setAuthCookie } from '../../utils/auth'
+import type { LoginCredentials } from '../../../types'
 
 export default defineEventHandler(async (event) => {
     try {
@@ -33,13 +34,23 @@ export default defineEventHandler(async (event) => {
         }
 
         // Compare password with stored hash
-        const result = bcrypt.compare(body.password, existingUser.password)
+        const result = await bcrypt.compare(body.password, existingUser.password)
         if (!result) {
             throw createError({
                 statusCode: 401,
                 statusMessage: 'Incorrect password'
             })
         }
+
+        // Create JOSE token
+        const token = await createToken({
+            userId: existingUser._id.toString(),
+            email: existingUser.email,
+            name: existingUser.name
+        })
+
+        // Set HTTP-only cookie
+        setAuthCookie(event, token)
 
         return {
             success: true,
@@ -50,7 +61,7 @@ export default defineEventHandler(async (event) => {
             }
         }
     } catch (error: unknown) {
-        if ((error as Error).statusCode) {
+        if ((error as any).statusCode) {
             throw error
         }
 

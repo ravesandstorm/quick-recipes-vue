@@ -38,8 +38,10 @@ export interface Recipe {
   favoriteCount: number
   rating?: number
   difficultyRating?: number
-  ingredientIDs: string[] // Array of ingredient IDs for searching
-  ingredients: RecipeIngredient[] // Populated ingredient data for display and calculations
+  ingredientIDs: string[] // Array of ingredient IDs with quantities
+  ingredients: RecipeIngredient[] // Populated ingredient data
+  isGlutenFree: boolean
+  isLactoseFree: boolean
   createdAt: Date
   updatedAt: Date
 }
@@ -105,6 +107,19 @@ export interface RecipeFormData {
   instructions: string[]
   ingredients: RecipeIngredient[]
   difficultyRating?: number
+  isGlutenFree: boolean
+  isLactoseFree: boolean
+}
+
+export interface UserProfile {
+  id: string
+  name: string
+  bio?: string
+  avatar?: string
+  followersCount: number
+  followingCount: number
+  recipesCount: number
+  isFollowing?: boolean
 }
 
 export interface Error {
@@ -116,4 +131,12 @@ export interface response {
   success?: boolean
   error?: Error
   user?: AuthUser
+}
+
+export interface TokenPayload {
+  userId?: string
+  email?: string
+  name?: string
+  iat: number
+  exp: number
 }

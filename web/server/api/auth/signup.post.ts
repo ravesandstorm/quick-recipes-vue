@@ -1,5 +1,6 @@
 import bcrypt from 'bcryptjs'
 import { connectToDatabase, getCollection } from '../../utils/db'
+import { createToken, setAuthCookie } from '../../utils/auth'
 import type { User, SignupCredentials, Error } from '../../../types'
 
 export default defineEventHandler(async (event) => {
@@ -48,6 +49,16 @@ export default defineEventHandler(async (event) => {
     }
 
     const result = await users.insertOne(newUser)
+
+    // Create JOSE token
+    const token = await createToken({
+      userId: result.insertedId.toString(),
+      email: newUser.email,
+      name: newUser.name
+    })
+
+    // Set HTTP-only cookie
+    setAuthCookie(event, token)
 
     return {
       success: true,

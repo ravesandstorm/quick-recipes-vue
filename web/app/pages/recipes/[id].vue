@@ -1,5 +1,5 @@
 <template>
-  <div v-if="recipe" class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div v-if="recipe" class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors duration-200">
     <!-- Success Message -->
     <div
       v-if="showSuccessMessage"
@@ -12,47 +12,47 @@
     <div class="fixed right-6 top-1/2 transform -translate-y-1/2 z-40 space-y-2">
       <button
         @click="scrollToSection('title')"
-        class="w-10 h-10 bg-white shadow-lg rounded-full flex items-center justify-center hover:bg-gray-50 transition-colors"
+        class="w-10 h-10 bg-white dark:bg-gray-800 shadow-lg rounded-full flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
         title="Go to title"
       >
-        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="w-5 h-5 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
         </svg>
       </button>
       <button
         @click="scrollToSection('macros')"
-        class="w-10 h-10 bg-white shadow-lg rounded-full flex items-center justify-center hover:bg-gray-50 transition-colors"
+        class="w-10 h-10 bg-white dark:bg-gray-800 shadow-lg rounded-full flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
         title="Go to nutrition"
       >
         📊
       </button>
       <button
         @click="scrollToSection('description')"
-        class="w-10 h-10 bg-white shadow-lg rounded-full flex items-center justify-center hover:bg-gray-50 transition-colors"
+        class="w-10 h-10 bg-white dark:bg-gray-800 shadow-lg rounded-full flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
         title="Go to description"
       >
         📝
       </button>
       <button
         @click="scrollToSection('ingredients')"
-        class="w-10 h-10 bg-white shadow-lg rounded-full flex items-center justify-center hover:bg-gray-50 transition-colors"
+        class="w-10 h-10 bg-white dark:bg-gray-800 shadow-lg rounded-full flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
         title="Go to ingredients"
       >
         🥕
       </button>
       <button
         @click="scrollToSection('instructions')"
-        class="w-10 h-10 bg-white shadow-lg rounded-full flex items-center justify-center hover:bg-gray-50 transition-colors"
+        class="w-10 h-10 bg-white dark:bg-gray-800 shadow-lg rounded-full flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
         title="Go to instructions"
       >
         👨‍🍳
       </button>
       <button
         @click="scrollToSection('instructions')"
-        class="w-10 h-10 bg-white shadow-lg rounded-full flex items-center justify-center hover:bg-gray-50 transition-colors"
+        class="w-10 h-10 bg-white dark:bg-gray-800 shadow-lg rounded-full flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
         title="Go to bottom"
       >
-        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="w-5 h-5 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
         </svg>
       </button>
@@ -62,8 +62,8 @@
     <section id="title" class="mb-8 animate-fade-in">
       <div class="flex justify-between items-start mb-4">
         <div class="flex-1">
-          <h1 class="text-4xl font-bold text-gray-900 mb-2">{{ recipe.title }}</h1>
-          <div class="flex items-center space-x-4 text-sm text-gray-600">
+          <h1 class="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-2">{{ recipe.title }}</h1>
+          <div class="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-400">
             <div class="flex items-center space-x-1">
               <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
@@ -84,8 +84,8 @@
         <!-- Rating and Favorite Actions -->
         <div class="flex items-center space-x-4">
           <!-- Rating Section -->
-          <div v-if="user" class="flex items-center space-x-2 bg-white p-3 rounded-lg border border-gray-200">
-            <span class="text-sm text-gray-600 font-medium">Your Rating:</span>
+          <div v-if="user" class="flex items-center space-x-2 bg-white dark:bg-gray-800 p-3 rounded-lg border border-gray-200 dark:border-gray-700">
+            <span class="text-sm text-gray-600 dark:text-gray-400 font-medium">Your Rating:</span>
             <div class="flex items-center space-x-1">
               <button
                 v-for="star in 5"
@@ -101,15 +101,15 @@
                 </svg>
               </button>
             </div>
-            <span v-if="userRating" class="text-sm text-gray-500">
+            <span v-if="userRating" class="text-sm text-gray-500 dark:text-gray-400">
               ({{ userRating }}/5)
             </span>
           </div>
 
           <!-- Login prompt for rating -->
-          <div v-else class="flex items-center space-x-2 bg-gray-50 p-3 rounded-lg border border-gray-200">
-            <span class="text-sm text-gray-500">
-              <NuxtLink to="/auth/login" class="text-blue-600 hover:text-blue-700 font-medium">
+          <div v-else class="flex items-center space-x-2 bg-gray-50 dark:bg-gray-800 p-3 rounded-lg border border-gray-200 dark:border-gray-700">
+            <span class="text-sm text-gray-500 dark:text-gray-400">
+              <NuxtLink to="/auth/login" class="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium">
                 Sign in
               </NuxtLink>
               to rate this recipe
@@ -122,7 +122,7 @@
             @click="toggleFavorite"
             :disabled="favoriteLoading"
             class="flex items-center space-x-2 px-4 py-2 rounded-lg border transition-all duration-200 disabled:opacity-50"
-            :class="isFavorited ? 'bg-red-50 border-red-200 text-red-600' : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'"
+            :class="isFavorited ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-600 dark:text-red-400' : 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'"
           >
             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
               <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
@@ -131,25 +131,25 @@
           </button>
 
           <!-- Login prompt for favorites -->
-          <div v-else class="flex items-center space-x-2 px-4 py-2 rounded-lg border border-gray-200 bg-gray-50">
-            <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+          <div v-else class="flex items-center space-x-2 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+            <svg class="w-5 h-5 text-gray-400 dark:text-gray-500" fill="currentColor" viewBox="0 0 24 24">
               <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
             </svg>
-            <span class="text-sm text-gray-500">{{ recipe?.favoriteCount || 0 }}</span>
+            <span class="text-sm text-gray-500 dark:text-gray-400">{{ recipe?.favoriteCount || 0 }}</span>
           </div>
           
           <!-- Creator Info -->
           <NuxtLink
-            v-if="recipe.creator"
-            :to="`/profile/${recipe.creator.id}`"
-            class="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
+            v-if="recipe.createdBy"
+            :to="`/users/${recipe.createdByID}`"
+            class="flex items-center space-x-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition-colors"
           >
             <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
               <span class="text-white text-sm font-medium">
-                {{ recipe.creator.name?.charAt(0).toUpperCase() }}
+                {{ recipe.createdBy?.charAt(0).toUpperCase() }}
               </span>
             </div>
-            <span class="font-medium">{{ recipe.creator.name }}</span>
+            <span class="font-medium">{{ recipe.createdBy }}</span>
           </NuxtLink>
         </div>
       </div>
@@ -157,20 +157,20 @@
     
     <!-- Nutrition Section -->
     <section id="macros" class="mb-8">
-      <div class="card bg-gradient-to-r from-blue-50 to-green-50 border-blue-200">
-        <h2 class="text-xl font-semibold text-gray-900 mb-4">Nutrition Information</h2>
+      <div class="card bg-gradient-to-r from-blue-50 to-green-50 dark:from-blue-900/20 dark:to-green-900/20 border-blue-200 dark:border-blue-800">
+        <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">Nutrition Information</h2>
         <div class="grid grid-cols-3 gap-6">
           <div class="text-center">
-            <div class="text-3xl font-bold text-blue-600 mb-1">{{ recipe.calories }}</div>
-            <div class="text-sm text-gray-600">Calories</div>
+            <div class="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-1">{{ recipe.calories }}</div>
+            <div class="text-sm text-gray-600 dark:text-gray-400">Calories</div>
           </div>
           <div class="text-center">
-            <div class="text-3xl font-bold text-green-600 mb-1">{{ recipe.protein }}g</div>
-            <div class="text-sm text-gray-600">Protein</div>
+            <div class="text-3xl font-bold text-green-600 dark:text-green-400 mb-1">{{ recipe.protein }}g</div>
+            <div class="text-sm text-gray-600 dark:text-gray-400">Protein</div>
           </div>
           <div class="text-center">
-            <div class="text-3xl font-bold text-orange-600 mb-1">{{ recipe.carbs }}g</div>
-            <div class="text-sm text-gray-600">Carbs</div>
+            <div class="text-3xl font-bold text-orange-600 dark:text-orange-400 mb-1">{{ recipe.carbs }}g</div>
+            <div class="text-sm text-gray-600 dark:text-gray-400">Carbs</div>
           </div>
         </div>
       </div>
@@ -179,20 +179,20 @@
     <!-- Description Section -->
     <section id="description" class="mb-8">
       <div class="card">
-        <h2 class="text-xl font-semibold text-gray-900 mb-4">Description</h2>
-        <p class="text-gray-700 leading-relaxed">{{ recipe.description }}</p>
+        <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">Description</h2>
+        <p class="text-gray-700 dark:text-gray-300 leading-relaxed">{{ recipe.description }}</p>
       </div>
     </section>
-    
+
     <!-- Ingredients Section -->
     <section id="ingredients" class="mb-8">
       <div class="card">
-        <h2 class="text-xl font-semibold text-gray-900 mb-6">Ingredients</h2>
+        <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-6">Ingredients</h2>
         <div class="space-y-3">
           <div
             v-for="(ingredient, index) in recipe.ingredients"
             :key="index"
-            class="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+            class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
           >
             <div class="flex items-center space-x-3">
               <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
@@ -287,13 +287,13 @@ const checkUserInteractions = async () => {
   if (!user.value) return
 
   try {
-    // Check if recipe is favorited (we'll need to create this endpoint)
-    const { data: userFavorites } = await $fetch<{success: boolean, data: string[]}>(`/api/users/${user.value.id}/favorites`)
+    // Check if recipe is favorited (auth handled by server middleware via cookies)
+    const { data: userFavorites } = await $fetch<{success: boolean, data: string[]}>(`/api/users/me/favorites`)
     isFavorited.value = userFavorites.includes(recipeId)
 
-    // Get user's rating for this recipe (we'll need to create this endpoint)
+    // Get user's rating for this recipe (auth handled by server middleware via cookies)
     try {
-      const { data: ratingData } = await $fetch<{success: boolean, data: {rating: number}}>(`/api/recipes/${recipeId}/user-rating?userId=${user.value.id}`)
+      const { data: ratingData } = await $fetch<{success: boolean, data: {rating: number}}>(`/api/recipes/${recipeId}/user-rating`)
       userRating.value = ratingData.rating
     } catch (error) {
       // User hasn't rated this recipe yet
@@ -317,61 +317,116 @@ const scrollToSection = (sectionId: string) => {
 }
 
 const toggleFavorite = async () => {
-  if (!user.value || !recipe.value) return
+  if (!user.value || !recipe.value) {
+    console.log('Cannot toggle favorite: user or recipe not available')
+    return
+  }
 
   try {
     favoriteLoading.value = true
-    const { data } = await $fetch<{success: boolean, data: {isFavorited: boolean, favoriteCount: number}}>(`/api/recipes/${recipeId}/favorite`, {
-      method: 'POST',
-      body: { userId: user.value.id }
+    console.log('Toggling favorite for recipe:', recipeId)
+
+    // Auth handled by server middleware via cookies
+    const response = await $fetch<{success: boolean, data: {isFavorited: boolean, favoriteCount: number}}>(`/api/recipes/${recipeId}/favorite`, {
+      method: 'POST'
     })
 
-    isFavorited.value = data.isFavorited
+    console.log('Favorite toggle response:', response)
+
+    isFavorited.value = response.data.isFavorited
     // Update the recipe's favorite count
     if (recipe.value) {
-      recipe.value.favoriteCount = data.favoriteCount
+      recipe.value.favoriteCount = response.data.favoriteCount
     }
 
     // Show success message
     showSuccessMessage.value = true
-    successMessage.value = data.isFavorited ? 'Added to favorites!' : 'Removed from favorites!'
+    successMessage.value = response.data.isFavorited ? 'Added to favorites!' : 'Removed from favorites!'
     setTimeout(() => {
       showSuccessMessage.value = false
     }, 3000)
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error toggling favorite:', error)
+    console.error('Error details:', error?.data || error?.message)
+
+    // Show error message
+    showSuccessMessage.value = true
+    successMessage.value = 'Failed to update favorite. Please try again.'
+    setTimeout(() => {
+      showSuccessMessage.value = false
+    }, 3000)
   } finally {
     favoriteLoading.value = false
   }
 }
 
 const submitRating = async (rating: number) => {
-  if (!user.value || !recipe.value || ratingLoading.value) return
+  if (!user.value || !recipe.value || ratingLoading.value) {
+    console.log('Cannot submit rating: user or recipe not available')
+    return
+  }
 
   try {
     ratingLoading.value = true
-    const { data } = await $fetch<{success: boolean, data: {userRating: number, averageRating: number, totalRatings: number}}>(`/api/recipes/${recipeId}/rating`, {
-      method: 'POST',
-      body: {
-        userId: user.value.id,
-        rating: rating
+
+    // If clicking the same rating, remove it
+    if (userRating.value === rating) {
+      console.log('Removing rating for recipe:', recipeId)
+
+      const response = await $fetch<{success: boolean, data: {userRating: number | null, averageRating: number, totalRatings: number}}>(`/api/recipes/${recipeId}/rating`, {
+        method: 'DELETE',
+        credentials: 'include'
+      })
+
+      console.log('Rating removal response:', response)
+
+      userRating.value = null
+      if (recipe.value) {
+        recipe.value.rating = response.data.averageRating
       }
-    })
 
-    userRating.value = data.userRating
-    // Update the recipe's average rating
-    if (recipe.value) {
-      recipe.value.rating = data.averageRating
+      showSuccessMessage.value = true
+      successMessage.value = 'Rating removed!'
+      setTimeout(() => {
+        showSuccessMessage.value = false
+      }, 3000)
+    } else {
+      // Submit new rating
+      console.log('Submitting rating:', rating, 'for recipe:', recipeId)
+
+      const response = await $fetch<{success: boolean, data: {userRating: number, averageRating: number, totalRatings: number}}>(`/api/recipes/${recipeId}/rating`, {
+        method: 'POST',
+        credentials: 'include',
+        body: {
+          rating: rating
+        }
+      })
+
+      console.log('Rating response:', response)
+
+      userRating.value = response.data.userRating
+      // Update the recipe's average rating
+      if (recipe.value) {
+        recipe.value.rating = response.data.averageRating
+      }
+
+      // Show success message
+      showSuccessMessage.value = true
+      successMessage.value = `Rated ${rating} star${rating > 1 ? 's' : ''}!`
+      setTimeout(() => {
+        showSuccessMessage.value = false
+      }, 3000)
     }
+  } catch (error: any) {
+    console.error('Error submitting rating:', error)
+    console.error('Error details:', error?.data || error?.message)
 
-    // Show success message
+    // Show error message
     showSuccessMessage.value = true
-    successMessage.value = `Rated ${rating} star${rating > 1 ? 's' : ''}!`
+    successMessage.value = 'Failed to submit rating. Please try again.'
     setTimeout(() => {
       showSuccessMessage.value = false
     }, 3000)
-  } catch (error) {
-    console.error('Error submitting rating:', error)
   } finally {
     ratingLoading.value = false
   }

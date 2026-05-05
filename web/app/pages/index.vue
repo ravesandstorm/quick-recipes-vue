@@ -2,13 +2,13 @@
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <!-- Hero Section -->
     <div class="text-center mb-12 animate-fade-in">
-      <h1 class="text-4xl md:text-6xl font-bold text-gray-900 mb-4">
+      <h1 class="text-4xl md:text-6xl font-bold text-gray-900 dark:text-gray-100 mb-4">
         Discover Amazing
-        <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
+        <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400">
           Recipes
         </span>
       </h1>
-      <p class="text-xl text-gray-600 max-w-2xl mx-auto mb-8">
+      <p class="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-8">
         Find, create, and share delicious recipes with our community of food lovers
       </p>
 
@@ -21,7 +21,7 @@
               @keyup.enter="performQuickSearch"
               type="text"
               placeholder="Search for recipes..."
-              class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg"
+              class="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg placeholder-gray-400 dark:placeholder-gray-500"
             />
             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <svg class="h-6 w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -48,24 +48,24 @@
     <!-- Quick Stats -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
       <div class="card text-center animate-slide-up">
-        <div class="text-3xl font-bold text-blue-600 mb-2">{{ stats.totalRecipes }}</div>
-        <div class="text-gray-600">Total Recipes</div>
+        <div class="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2">{{ stats.totalRecipes }}</div>
+        <div class="text-gray-600 dark:text-gray-400">Total Recipes</div>
       </div>
       <div class="card text-center animate-slide-up" style="animation-delay: 0.1s">
-        <div class="text-3xl font-bold text-green-600 mb-2">{{ stats.totalUsers }}</div>
-        <div class="text-gray-600">Active Cooks</div>
+        <div class="text-3xl font-bold text-green-600 dark:text-green-400 mb-2">{{ stats.totalUsers }}</div>
+        <div class="text-gray-600 dark:text-gray-400">Active Cooks</div>
       </div>
       <div class="card text-center animate-slide-up" style="animation-delay: 0.2s">
-        <div class="text-3xl font-bold text-purple-600 mb-2">{{ stats.totalIngredients }}</div>
-        <div class="text-gray-600">Ingredients</div>
+        <div class="text-3xl font-bold text-purple-600 dark:text-purple-400 mb-2">{{ stats.totalIngredients }}</div>
+        <div class="text-gray-600 dark:text-gray-400">Ingredients</div>
       </div>
     </div>
 
     <!-- Featured Recipes -->
     <div class="mb-12">
       <div class="flex justify-between items-center mb-6">
-        <h2 class="text-3xl font-bold text-gray-900">Featured Recipes</h2>
-        <NuxtLink to="/search" class="text-blue-600 hover:text-blue-700 font-medium">
+        <h2 class="text-3xl font-bold text-gray-900 dark:text-gray-100">Featured Recipes</h2>
+        <NuxtLink to="/search" class="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium">
           View All →
         </NuxtLink>
       </div>

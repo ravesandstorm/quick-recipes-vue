@@ -9,20 +9,31 @@ export default defineNuxtConfig({
     '@vueuse/nuxt'
   ],
 
+  tailwindcss: {
+    config: {
+      darkMode: 'class'
+    }
+  },
+
   runtimeConfig: {
     // Private keys (only available on server-side)
     authSecret: process.env.NUXT_AUTH_SECRET,
-    googleClientId: process.env.GOOGLE_CLIENT_ID,
     googleClientSecret: process.env.GOOGLE_CLIENT_SECRET,
     mongodbUri: process.env.MONGODB_URI,
     // Public keys (exposed to client-side)
     public: {
-      authUrl: process.env.NUXT_AUTH_URL
+      authUrl: process.env.NUXT_AUTH_URL,
+      googleClientId: process.env.GOOGLE_CLIENT_ID
     }
   },
 
   // Make dashboard accessible without authentication
   ssr: true,
 
-  css: ['~/assets/main.css']
+  css: ['~/assets/main.css'],
+
+  app: {
+    pageTransition: { name: 'page', mode: 'out-in' },
+    layoutTransition: { name: 'layout', mode: 'out-in' }
+  }
 })
