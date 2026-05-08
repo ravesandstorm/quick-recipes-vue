@@ -30,6 +30,11 @@ export default defineNuxtConfig({
   // Make dashboard accessible without authentication
   ssr: true,
 
+  devServer: {
+    port: 3001,
+    host: '0.0.0.0',
+  },
+
   css: ['~/assets/main.css'],
 
   app: {
