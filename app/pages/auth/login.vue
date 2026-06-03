@@ -2,7 +2,7 @@
   <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-md w-full space-y-8">
       <div class="text-center">
-        <h2 class="mt-6 text-3xl font-extrabold text-gray-900 animate-fade-in">
+        <h2 class="mt-6 text-3xl font-extrabold text-gray-900 dark:text-gray-100 animate-fade-in">
           Sign in to Quick Recipes
         </h2>
         <p class="mt-2 text-sm text-gray-600">
@@ -44,7 +44,7 @@
         <!-- Email/Password Form -->
         <form @submit.prevent="signInWithCredentials" class="mt-6 space-y-6">
           <div>
-            <label for="email" class="block text-sm font-medium text-gray-700">Email address</label>
+            <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email address</label>
             <input
               id="email"
               v-model="form.email"
@@ -56,7 +56,7 @@
           </div>
           
           <div>
-            <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+            <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Password</label>
             <input
               id="password"
               v-model="form.password"
@@ -67,7 +67,7 @@
             />
           </div>
           
-          <div v-if="error" class="text-red-600 text-sm bg-red-50 p-3 rounded-lg">
+          <div v-if="error" class="text-red-600 dark:text-red-400 text-sm bg-red-50 dark:bg-red-900/20 p-3 rounded-lg">
             {{ error }}
           </div>
           

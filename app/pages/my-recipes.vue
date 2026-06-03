@@ -4,8 +4,8 @@
     <div class="mb-8">
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 class="text-3xl font-bold text-gray-900 mb-2">My Recipes</h1>
-          <p class="text-gray-600">Manage your created recipes and favorites</p>
+          <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">My Recipes</h1>
+          <p class="text-gray-600 dark:text-gray-400">Manage your created recipes and favorites</p>
         </div>
         <NuxtLink
           to="/recipes/create"
@@ -21,7 +21,7 @@
 
     <!-- Tabs -->
     <div class="mb-8">
-      <div class="border-b border-gray-200">
+      <div class="border-b border-gray-200 dark:border-gray-700">
         <nav class="-mb-px flex space-x-8">
           <button
             @click="activeTab = 'created'"
@@ -29,7 +29,7 @@
               'py-2 px-1 border-b-2 font-medium text-sm',
               activeTab === 'created'
                 ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:border-gray-300 dark:hover:border-gray-500'
             ]"
           >
             My Recipes ({{ createdRecipes.length }})
@@ -40,7 +40,7 @@
               'py-2 px-1 border-b-2 font-medium text-sm',
               activeTab === 'favorites'
                 ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:border-gray-300 dark:hover:border-gray-500'
             ]"
           >
             Favorites ({{ favoriteRecipes.length }})
@@ -75,7 +75,7 @@
         />
       </div>
       <div v-else class="text-center py-12">
-        <div class="text-gray-500 mb-4">You haven't created any recipes yet</div>
+        <div class="text-gray-500 dark:text-gray-400 mb-4">You haven't created any recipes yet</div>
         <NuxtLink to="/recipes/create" class="btn-primary">
           Create Your First Recipe
         </NuxtLink>
@@ -93,7 +93,7 @@
         />
       </div>
       <div v-else class="text-center py-12">
-        <div class="text-gray-500 mb-4">You haven't favorited any recipes yet</div>
+        <div class="text-gray-500 dark:text-gray-400 mb-4">You haven't favorited any recipes yet</div>
         <NuxtLink to="/search" class="btn-primary">
           Discover Recipes
         </NuxtLink>

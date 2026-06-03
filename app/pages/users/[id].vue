@@ -112,26 +112,26 @@
             <div class="grid grid-cols-3 gap-4 sm:gap-8">
               <NuxtLink
                 :to="`/users/${userProfile.id}/recipes`"
-                class="text-center hover:bg-gray-50 p-2 rounded-lg transition-colors"
+                class="text-center hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded-lg transition-colors"
               >
-                <div class="text-2xl font-bold text-gray-900">{{ stats.recipesCount }}</div>
-                <div class="text-sm text-gray-600">Recipes</div>
+                <div class="text-2xl font-bold text-gray-900 dark:text-gray-100">{{ stats.recipesCount }}</div>
+                <div class="text-sm text-gray-600 dark:text-gray-400">Recipes</div>
               </NuxtLink>
-              
+
               <NuxtLink
                 :to="`/users/${userProfile.id}/followers`"
-                class="text-center hover:bg-gray-50 p-2 rounded-lg transition-colors"
+                class="text-center hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded-lg transition-colors"
               >
-                <div class="text-2xl font-bold text-gray-900">{{ stats.followersCount }}</div>
-                <div class="text-sm text-gray-600">Followers</div>
+                <div class="text-2xl font-bold text-gray-900 dark:text-gray-100">{{ stats.followersCount }}</div>
+                <div class="text-sm text-gray-600 dark:text-gray-400">Followers</div>
               </NuxtLink>
-              
+
               <NuxtLink
                 :to="`/users/${userProfile.id}/following`"
-                class="text-center hover:bg-gray-50 p-2 rounded-lg transition-colors"
+                class="text-center hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded-lg transition-colors"
               >
-                <div class="text-2xl font-bold text-gray-900">{{ stats.followingCount }}</div>
-                <div class="text-sm text-gray-600">Following</div>
+                <div class="text-2xl font-bold text-gray-900 dark:text-gray-100">{{ stats.followingCount }}</div>
+                <div class="text-sm text-gray-600 dark:text-gray-400">Following</div>
               </NuxtLink>
             </div>
           </div>
@@ -140,7 +140,7 @@
 
       <!-- User's Recipes -->
       <div class="card">
-        <h2 class="text-xl font-semibold text-gray-900 mb-6">Recipes by {{ userProfile.name }}</h2>
+        <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-6">Recipes by {{ userProfile.name }}</h2>
         
         <!-- Loading Recipes -->
         <div v-if="recipesLoading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -165,15 +165,15 @@
         
         <!-- No Recipes -->
         <div v-else class="text-center py-12">
-          <div class="text-gray-500">{{ userProfile.name }} hasn't created any recipes yet</div>
+          <div class="text-gray-500 dark:text-gray-400">{{ userProfile.name }} hasn't created any recipes yet</div>
         </div>
       </div>
     </div>
     
     <!-- Error State -->
     <div v-else class="text-center py-12">
-      <h1 class="text-2xl font-bold text-gray-900 mb-4">User Not Found</h1>
-      <p class="text-gray-600 mb-6">The user you're looking for doesn't exist.</p>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">User Not Found</h1>
+      <p class="text-gray-600 dark:text-gray-400 mb-6">The user you're looking for doesn't exist.</p>
       <NuxtLink to="/" class="btn-primary">Go Home</NuxtLink>
     </div>
   </div>

@@ -159,7 +159,7 @@ interface Recipe {
   createdAt: Date
 }
 
-const { user } = useLocalData()
+const { user } = useSimpleAuth()
 
 const loading = ref(true)
 const recipes = ref<Recipe[]>([])
@@ -212,11 +212,10 @@ const fetchData = async () => {
       }
     } catch (statsError) {
       console.error('Error fetching stats:', statsError)
-      // Use default stats if API fails
       stats.value = {
-        totalRecipes: 1247,
-        totalUsers: 3892,
-        totalIngredients: 456
+        totalRecipes: 0,
+        totalUsers: 0,
+        totalIngredients: 0
       }
     }
 

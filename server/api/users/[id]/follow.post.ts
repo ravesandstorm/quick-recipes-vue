@@ -1,7 +1,6 @@
-import { MongoClient, ObjectId } from 'mongodb'
+import { ObjectId } from 'mongodb'
+import { connectToDatabase, getCollection } from '../../../utils/db'
 import { getAuthenticatedUser } from '../../../utils/auth'
-
-const client = new MongoClient(process.env.MONGODB_URI || 'mongodb://localhost:27017')
 
 export default defineEventHandler(async (event) => {
   try {
@@ -30,9 +29,8 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    await client.connect()
-    const db = client.db('quick-recipes')
-    const usersCollection = db.collection('users')
+    await connectToDatabase()
+    const usersCollection = getCollection('users')
 
     // Check if target user exists
     const targetUser = await usersCollection.findOne({ _id: new ObjectId(targetUserId) })
@@ -53,7 +51,7 @@ export default defineEventHandler(async (event) => {
         { _id: new ObjectId(currentUser.userId) },
         { $pull: { following: targetUserId } }
       )
-      
+
       await usersCollection.updateOne(
         { _id: new ObjectId(targetUserId) },
         { $pull: { followers: currentUser.userId } }
@@ -64,7 +62,7 @@ export default defineEventHandler(async (event) => {
         { _id: new ObjectId(currentUser.userId) },
         { $addToSet: { following: targetUserId } }
       )
-      
+
       await usersCollection.updateOne(
         { _id: new ObjectId(targetUserId) },
         { $addToSet: { followers: currentUser.userId } }
@@ -83,18 +81,16 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Follow/unfollow error:', error)
-    
+
     if (error.statusCode) {
       throw error
     }
-    
+
     throw createError({
       statusCode: 500,
       statusMessage: 'Internal server error'
     })
-  } finally {
-    await client.close()
   }
 })

@@ -1,8 +1,10 @@
-import { MongoClient, ObjectId } from 'mongodb'
+import { ObjectId } from 'mongodb'
+import { connectToDatabase, getCollection } from '../../../utils/db'
+import { getAuthenticatedUser } from '../../../utils/auth'
 
 export default defineEventHandler(async (event) => {
-  const user = event.context.user
-  
+  const user = await getAuthenticatedUser(event)
+
   if (!user || !user.userId) {
     throw createError({
       statusCode: 401,
@@ -11,7 +13,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const recipeId = getRouterParam(event, 'id')
-  
+
   if (!recipeId) {
     throw createError({
       statusCode: 400,
@@ -19,19 +21,15 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const config = useRuntimeConfig()
-  const client = new MongoClient(config.mongodbUri)
-
   try {
-    await client.connect()
-    const db = client.db('quick-recipes')
-    const ratings = db.collection('ratings')
-    const recipes = db.collection('recipes')
+    await connectToDatabase()
+    const ratings = getCollection('ratings')
+    const recipes = getCollection('recipes')
 
-    // Delete the user's rating
+    // Delete the user's rating (recipeId and userId are stored as strings)
     const deleteResult = await ratings.deleteOne({
-      recipeId: new ObjectId(recipeId),
-      userId: new ObjectId(user.userId)
+      recipeId: recipeId,
+      userId: user.userId
     })
 
     if (deleteResult.deletedCount === 0) {
@@ -42,7 +40,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // Recalculate average rating
-    const allRatings = await ratings.find({ recipeId: new ObjectId(recipeId) }).toArray()
+    const allRatings = await ratings.find({ recipeId: recipeId }).toArray()
     const totalRatings = allRatings.length
     const averageRating = totalRatings > 0
       ? allRatings.reduce((sum, r) => sum + r.rating, 0) / totalRatings
@@ -51,11 +49,11 @@ export default defineEventHandler(async (event) => {
     // Update recipe with new average rating
     await recipes.updateOne(
       { _id: new ObjectId(recipeId) },
-      { 
-        $set: { 
+      {
+        $set: {
           rating: Math.round(averageRating * 10) / 10,
           numberOfRatings: totalRatings
-        } 
+        }
       }
     )
 
@@ -68,13 +66,13 @@ export default defineEventHandler(async (event) => {
       }
     }
   } catch (error: any) {
+    if (error.statusCode) {
+      throw error
+    }
     console.error('Error deleting rating:', error)
     throw createError({
-      statusCode: error.statusCode || 500,
-      statusMessage: error.statusMessage || 'Failed to delete rating'
+      statusCode: 500,
+      statusMessage: 'Failed to delete rating'
     })
-  } finally {
-    await client.close()
   }
 })
-

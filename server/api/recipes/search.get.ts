@@ -60,16 +60,23 @@ export default defineEventHandler(async (event) => {
       pipeline.push({ $match: matchStage })
     }
     
+    // Convert createdByID string to ObjectId for lookup
+    pipeline.push({
+      $addFields: {
+        createdByIDObj: { $toObjectId: '$createdByID' }
+      }
+    })
+
     // Lookup creator information
     pipeline.push({
       $lookup: {
         from: 'users',
-        localField: 'createdByID',
+        localField: 'createdByIDObj',
         foreignField: '_id',
         as: 'creator'
       }
     })
-    
+
     // Add computed fields
     pipeline.push({
       $addFields: {
@@ -157,47 +164,12 @@ export default defineEventHandler(async (event) => {
         totalPages: Math.ceil(total / limit)
       }
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('Search error:', error)
-    
-    // Return sample search results for development
-    const sampleResults = [
-      {
-        id: '1',
-        title: 'Classic Spaghetti Carbonara',
-        description: 'A traditional Italian pasta dish with eggs, cheese, and pancetta',
-        calories: 520,
-        protein: 25,
-        carbs: 65,
-        rating: 4.8,
-        difficultyRating: 2,
-        favoriteCount: 156,
-        createdBy: 'Chef Mario',
-        createdAt: new Date()
-      },
-      {
-        id: '2',
-        title: 'Healthy Buddha Bowl',
-        description: 'Nutritious bowl with quinoa, roasted vegetables, and tahini dressing',
-        calories: 380,
-        protein: 15,
-        carbs: 45,
-        rating: 4.6,
-        difficultyRating: 1,
-        favoriteCount: 89,
-        createdBy: 'Sarah Green',
-        createdAt: new Date()
-      }
-    ]
-    
-    return {
-      success: true,
-      data: {
-        recipes: sampleResults,
-        total: sampleResults.length,
-        page: 1,
-        totalPages: 1
-      }
-    }
+    if (error.statusCode) throw error
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'Failed to search recipes'
+    })
   }
 })
