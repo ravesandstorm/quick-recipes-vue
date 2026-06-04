@@ -56,6 +56,10 @@ export default defineEventHandler(async (event) => {
       }
     }
     
+    // Dietary filters
+    if (query.isGlutenFree === 'true' || query.isGlutenFree === true) matchStage.isGlutenFree = true
+    if (query.isLactoseFree === 'true' || query.isLactoseFree === true) matchStage.isLactoseFree = true
+
     if (Object.keys(matchStage).length > 0) {
       pipeline.push({ $match: matchStage })
     }

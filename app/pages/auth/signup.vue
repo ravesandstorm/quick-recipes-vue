@@ -259,13 +259,10 @@ const signUpWithCredentials = async () => {
       }
     })
 
-    // Authentication is now handled via HTTP-only cookies
-    success.value = 'Account created successfully! Redirecting to dashboard...'
-
-    // Wait a moment then redirect to dashboard
-    setTimeout(async () => {
-      await navigateTo('/')
-    }, 2000)
+    // Cookie is set by server — update shared auth state and redirect immediately
+    const { checkAuth } = useSimpleAuth()
+    await checkAuth()
+    await navigateTo('/')
 
   } catch (err: unknown) {
     error.value = (err as Error)?.statusMessage || 'Failed to create account'

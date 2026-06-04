@@ -114,7 +114,7 @@
 
     <!-- Popular Categories -->
     <div class="mb-12">
-      <h2 class="text-3xl font-bold text-gray-900 mb-6">Popular Categories</h2>
+      <h2 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-6">Popular Categories</h2>
       <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
         <button
           v-for="category in categories"
@@ -123,7 +123,7 @@
           class="card text-center hover:shadow-md transition-all duration-200 hover:scale-105"
         >
           <div class="text-2xl mb-2">{{ category.icon }}</div>
-          <div class="text-sm font-medium text-gray-700">{{ category.name }}</div>
+          <div class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ category.name }}</div>
         </button>
       </div>
     </div>

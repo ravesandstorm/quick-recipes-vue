@@ -15,18 +15,25 @@
       <!-- Suggestions Dropdown -->
       <div
         v-if="showSuggestions && suggestions.length > 0"
-        class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto"
+        class="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg max-h-60 overflow-y-auto"
       >
         <button
           v-for="ingredient in suggestions"
           :key="ingredient.id"
           type="button"
           @click="selectIngredient(ingredient)"
-          class="w-full px-4 py-3 text-left hover:bg-gray-50 border-b border-gray-100 last:border-b-0 focus:outline-none focus:bg-gray-50"
+          class="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-700 last:border-b-0 focus:outline-none"
         >
-          <div class="font-medium text-gray-900">{{ ingredient.name }}</div>
-          <div class="text-sm text-gray-500">
-            {{ ingredient.caloriesPerUnit }} cal per {{ ingredient.defaultUnit }}
+          <div class="flex items-center justify-between">
+            <div class="font-medium text-gray-900 dark:text-gray-100">{{ ingredient.name }}</div>
+            <span v-if="ingredient.category" class="text-xs px-2 py-0.5 bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 rounded-full capitalize">
+              {{ ingredient.category }}
+            </span>
+          </div>
+          <div class="flex items-center space-x-3 text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+            <span>{{ ingredient.caloriesPerUnit }} cal/{{ ingredient.defaultUnit }}</span>
+            <span v-if="ingredient.isLiquid" class="text-blue-500">💧 liquid</span>
+            <span v-else-if="ingredient.isCountable" class="text-green-500">🔢 countable</span>
           </div>
         </button>
       </div>

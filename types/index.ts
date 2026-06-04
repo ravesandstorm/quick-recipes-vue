@@ -77,6 +77,8 @@ export interface SearchFilters {
   maxProtein?: number
   minCarbs?: number
   maxCarbs?: number
+  isGlutenFree?: boolean
+  isLactoseFree?: boolean
   sortBy?: 'rating' | 'calories' | 'protein' | 'carbs' | 'favoriteCount' | 'createdAt'
   sortOrder?: 'asc' | 'desc'
   limit?: number

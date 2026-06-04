@@ -13,6 +13,11 @@
         </p>
       </div>
       
+      <!-- Redirect message -->
+      <div v-if="route.query.redirect" class="rounded-lg bg-blue-50 dark:bg-blue-900/30 px-4 py-3 text-sm text-blue-700 dark:text-blue-300 text-center">
+        Please sign in to continue
+      </div>
+
       <div class="card animate-slide-up">
         <!-- Google OAuth Button -->
         <button
@@ -94,6 +99,7 @@
 <script setup lang="ts">
 import type { Error } from '../../../types'
 
+const route = useRoute()
 const runtimeConfig = useRuntimeConfig()
 const googleClientId = runtimeConfig.public.googleClientId
 
@@ -212,9 +218,12 @@ const signInWithCredentials = async () => {
       }
     })
 
-    // Authentication is now handled via HTTP-only cookies
-    // Redirect to dashboard
-    await navigateTo('/')
+    // Cookie is set by server — update shared auth state then redirect
+    const { checkAuth } = useSimpleAuth()
+    await checkAuth()
+
+    const redirectTo = (route.query.redirect as string) || '/'
+    await navigateTo(redirectTo)
 
   } catch (err: unknown) {
     error.value = (err as Error)?.statusMessage || 'Failed to sign in'

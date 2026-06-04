@@ -138,34 +138,83 @@
         </div>
       </div>
 
-      <!-- User's Recipes -->
+      <!-- Recipes / Favorites Tabs -->
       <div class="card">
-        <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-6">Recipes by {{ userProfile.name }}</h2>
-        
-        <!-- Loading Recipes -->
-        <div v-if="recipesLoading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div v-for="i in 6" :key="i" class="recipe-card animate-pulse">
-            <div class="h-48 bg-gray-200 rounded-t-xl"></div>
-            <div class="p-6">
-              <div class="h-4 bg-gray-200 rounded mb-2"></div>
-              <div class="h-3 bg-gray-200 rounded mb-4 w-3/4"></div>
+        <!-- Tab Navigation -->
+        <div class="border-b border-gray-200 dark:border-gray-700 mb-6">
+          <nav class="-mb-px flex space-x-8">
+            <button
+              @click="profileTab = 'recipes'"
+              :class="[
+                'py-2 px-1 border-b-2 font-medium text-sm',
+                profileTab === 'recipes'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:border-gray-300 dark:hover:border-gray-500'
+              ]"
+            >
+              Recipes ({{ stats.recipesCount }})
+            </button>
+            <button
+              @click="switchToFavorites"
+              :class="[
+                'py-2 px-1 border-b-2 font-medium text-sm',
+                profileTab === 'favorites'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:border-gray-300 dark:hover:border-gray-500'
+              ]"
+            >
+              Favorites
+            </button>
+          </nav>
+        </div>
+
+        <!-- Recipes Tab -->
+        <div v-if="profileTab === 'recipes'">
+          <div v-if="recipesLoading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div v-for="i in 6" :key="i" class="recipe-card animate-pulse">
+              <div class="h-48 bg-gray-200 dark:bg-gray-700 rounded-t-xl"></div>
+              <div class="p-6">
+                <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
+                <div class="h-3 bg-gray-200 dark:bg-gray-700 rounded mb-4 w-3/4"></div>
+              </div>
             </div>
           </div>
+          <div v-else-if="userRecipes.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <RecipeCard
+              v-for="recipe in userRecipes"
+              :key="recipe.id"
+              :recipe="recipe"
+              class="animate-fade-in"
+            />
+          </div>
+          <div v-else class="text-center py-12">
+            <div class="text-gray-500 dark:text-gray-400">{{ userProfile.name }} hasn't created any recipes yet</div>
+          </div>
         </div>
-        
-        <!-- Recipes Grid -->
-        <div v-else-if="userRecipes.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <RecipeCard
-            v-for="recipe in userRecipes"
-            :key="recipe.id"
-            :recipe="recipe"
-            class="animate-fade-in"
-          />
-        </div>
-        
-        <!-- No Recipes -->
-        <div v-else class="text-center py-12">
-          <div class="text-gray-500 dark:text-gray-400">{{ userProfile.name }} hasn't created any recipes yet</div>
+
+        <!-- Favorites Tab -->
+        <div v-else-if="profileTab === 'favorites'">
+          <div v-if="favoritesLoading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div v-for="i in 6" :key="i" class="recipe-card animate-pulse">
+              <div class="h-48 bg-gray-200 dark:bg-gray-700 rounded-t-xl"></div>
+              <div class="p-6">
+                <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
+                <div class="h-3 bg-gray-200 dark:bg-gray-700 rounded mb-4 w-3/4"></div>
+              </div>
+            </div>
+          </div>
+          <div v-else-if="userFavorites.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <RecipeCard
+              v-for="recipe in userFavorites"
+              :key="recipe.id"
+              :recipe="recipe"
+              :initialFavorited="true"
+              class="animate-fade-in"
+            />
+          </div>
+          <div v-else class="text-center py-12">
+            <div class="text-gray-500 dark:text-gray-400">{{ userProfile.name }} hasn't favorited any recipes yet</div>
+          </div>
         </div>
       </div>
     </div>
@@ -189,12 +238,15 @@ const userId = route.params.id as string
 
 const loading = ref(true)
 const recipesLoading = ref(true)
+const favoritesLoading = ref(false)
 const followLoading = ref(false)
 const editMode = ref(false)
 const updating = ref(false)
 const userProfile = ref<User | null>(null)
 const userRecipes = ref<Recipe[]>([])
+const userFavorites = ref<Recipe[]>([])
 const isFollowing = ref(false)
+const profileTab = ref<'recipes' | 'favorites'>('recipes')
 
 const stats = ref({
   recipesCount: 0,
@@ -297,6 +349,25 @@ const updateProfile = async () => {
     console.error('Error updating profile:', error)
   } finally {
     updating.value = false
+  }
+}
+
+const fetchUserFavorites = async () => {
+  try {
+    favoritesLoading.value = true
+    const { data } = await $fetch(`/api/users/${userId}/favorites`) as { success: boolean, data: Recipe[] }
+    userFavorites.value = data || []
+  } catch (error) {
+    console.error('Error fetching user favorites:', error)
+  } finally {
+    favoritesLoading.value = false
+  }
+}
+
+const switchToFavorites = () => {
+  profileTab.value = 'favorites'
+  if (userFavorites.value.length === 0 && !favoritesLoading.value) {
+    fetchUserFavorites()
   }
 }
 

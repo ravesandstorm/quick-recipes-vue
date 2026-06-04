@@ -1,17 +1,18 @@
-export default defineNuxtRouteMiddleware(async (to, from) => {
-  // Only protect specific routes that require user authentication
+export default defineNuxtRouteMiddleware(async (to) => {
   const protectedRoutes = ['/recipes/create', '/profile', '/my-recipes']
   const isProtectedRoute = protectedRoutes.some(route => to.path.startsWith(route))
 
-  if (isProtectedRoute) {
-    // Check authentication status from server
-    try {
-      const { data } = await $fetch('/api/auth/me')
-      if (!data) {
-        return navigateTo('/auth/login')
-      }
-    } catch (error) {
-      return navigateTo('/auth/login')
+  if (!isProtectedRoute) return
+
+  // Prevent redirect loops
+  if (to.path === '/auth/login') return
+
+  try {
+    const response = await $fetch('/api/auth/me') as { success: boolean, data: any }
+    if (!response?.data) {
+      return navigateTo(`/auth/login?redirect=${encodeURIComponent(to.fullPath)}`)
     }
+  } catch {
+    return navigateTo(`/auth/login?redirect=${encodeURIComponent(to.fullPath)}`)
   }
 })

@@ -1,3 +1,5 @@
 allowBuilds:
+  '@firebase/util': set this to true or false
   '@parcel/watcher': false
   esbuild: false
+  protobufjs: set this to true or false

@@ -128,6 +128,21 @@
               <option value="createdAt">Newest</option>
             </select>
           </div>
+
+          <!-- Dietary Filters -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Dietary</label>
+            <div class="space-y-2">
+              <label class="flex items-center space-x-2 cursor-pointer">
+                <input v-model="filters.isGlutenFree" type="checkbox" class="w-4 h-4 text-blue-600 rounded border-gray-300 dark:border-gray-600 focus:ring-blue-500" />
+                <span class="text-sm text-gray-700 dark:text-gray-300">🌾 Gluten Free</span>
+              </label>
+              <label class="flex items-center space-x-2 cursor-pointer">
+                <input v-model="filters.isLactoseFree" type="checkbox" class="w-4 h-4 text-blue-600 rounded border-gray-300 dark:border-gray-600 focus:ring-blue-500" />
+                <span class="text-sm text-gray-700 dark:text-gray-300">🥛 Lactose Free</span>
+              </label>
+            </div>
+          </div>
         </div>
         
         <div class="flex justify-end space-x-4 mt-6">
@@ -336,6 +351,8 @@ const clearFilters = () => {
     maxProtein: undefined,
     minCarbs: undefined,
     maxCarbs: undefined,
+    isGlutenFree: false,
+    isLactoseFree: false,
     sortBy: 'favoriteCount',
     sortOrder: 'desc'
   })

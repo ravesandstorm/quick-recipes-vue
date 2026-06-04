@@ -18,7 +18,7 @@
       </button>
 
       <!-- Difficulty Badge -->
-      <div v-if="recipe.difficultyRating" class="absolute top-3 left-3 px-2 py-1 bg-white/80 backdrop-blur-sm rounded-full text-xs font-medium">
+      <div v-if="recipe.difficultyRating" class="absolute top-3 left-3 px-2 py-1 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-full text-xs font-medium text-gray-800 dark:text-gray-200">
         {{ getDifficultyText(recipe.difficultyRating) }}
       </div>
 
@@ -39,7 +39,7 @@
     <div class="p-6">
       <!-- Title with Rating -->
       <div class="flex items-start justify-between mb-2">
-        <h3 class="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2 flex-1 pr-2">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2 flex-1 pr-2">
           {{ recipe.title }}
         </h3>
         <div class="flex items-center space-x-1 text-sm text-gray-500 flex-shrink-0">
@@ -50,12 +50,12 @@
         </div>
       </div>
 
-      <p class="text-gray-600 text-sm mb-4 line-clamp-2">
+      <p class="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-2">
         {{ recipe.description }}
       </p>
 
       <!-- Recipe Stats -->
-      <div class="flex items-center justify-between text-sm text-gray-500 mb-4">
+      <div class="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400 mb-4">
         <div class="flex items-center space-x-3">
           <div class="flex items-center space-x-1">
             <span>🔥</span>
@@ -66,7 +66,7 @@
             <span>{{ recipe.protein }}g</span>
           </div>
           <div class="flex items-center space-x-1">
-            <span>🌾</span>
+            <span>🍞</span>
             <span>{{ recipe.carbs }}g</span>
           </div>
         </div>
@@ -85,20 +85,20 @@
           v-if="recipe.createdByID"
           :to="`/users/${recipe.createdByID}`"
           @click.stop
-          class="flex items-center space-x-2 hover:bg-gray-50 rounded-lg p-1 -m-1 transition-colors"
+          class="flex items-center space-x-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg p-1 -m-1 transition-colors"
         >
           <div class="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
             <span class="text-white text-xs font-medium">
               {{ getCreatorInitial() }}
             </span>
           </div>
-          <span class="text-sm text-gray-600 hover:text-blue-600 transition-colors">{{ recipe.createdBy || 'Anonymous' }}</span>
+          <span class="text-sm text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">{{ recipe.createdBy || 'Anonymous' }}</span>
         </NuxtLink>
         <div v-else class="flex items-center space-x-2">
           <div class="w-6 h-6 bg-gray-400 rounded-full flex items-center justify-center">
             <span class="text-white text-xs font-medium">?</span>
           </div>
-          <span class="text-sm text-gray-600">Anonymous</span>
+          <span class="text-sm text-gray-600 dark:text-gray-300">Anonymous</span>
         </div>
 
       </div>
@@ -111,12 +111,13 @@ import type { Recipe } from '../../types'
 
 interface Props {
   recipe: Recipe & { createdBy?: string }
+  initialFavorited?: boolean
 }
 
 const props = defineProps<Props>()
 
 const { user } = useSimpleAuth()
-const isFavorited = ref(false)
+const isFavorited = ref(props.initialFavorited ?? false)
 const favoriteCount = ref(props.recipe.favoriteCount)
 
 const goToRecipe = () => {
