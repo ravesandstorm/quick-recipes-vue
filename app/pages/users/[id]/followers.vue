@@ -136,8 +136,8 @@ const fetchFollowers = async () => {
         let isFollowing = false
         if (currentUser.value && follower.id !== currentUser.value.id) {
           try {
-            const currentUserData = await $fetch(`/api/users/${currentUser.value.id}`) as { success: boolean, data: User }
-            isFollowing = currentUserData.data.following?.includes(follower.id) || false
+            const followData = await $fetch(`/api/users/${follower.id}`) as { data: { isFollowing: boolean } }
+            isFollowing = followData.data.isFollowing ?? false
           } catch (error) {
             console.error('Error checking follow status:', error)
           }
@@ -147,7 +147,7 @@ const fetchFollowers = async () => {
           ...follower,
           isFollowing,
           followLoading: false,
-          recipesCount: follower.createdRecipes?.length || 0
+          recipesCount: follower.recipesCount ?? 0
         }
       })
     )

@@ -2,17 +2,13 @@ import { ObjectId } from 'mongodb'
 
 export interface User {
   _id?: ObjectId
-  id?: number
   email: string
   name: string
   bio?: string
   password?: string // Only for email/password auth
   googleId?: string // For Google OAuth
   avatar?: string
-  followers: string[] // Array of user IDs
-  following: string[] // Array of user IDs
-  createdRecipes: string[] // Array of recipe IDs
-  // favRecipes removed — favorites now stored in the 'favorites' collection
+  // followers/following/createdRecipes removed — stored in 'follows' and 'recipes' collections
 }
 
 export interface UserProfile {
@@ -35,13 +31,46 @@ export interface Recipe {
   carbs: number
   instructions: string[]
   createdByID: string
-  favoriteCount: number
-  rating?: number
+  // favoriteCount and rating removed — computed from 'favorites' and 'ratings' collections
   difficultyRating?: number
-  ingredientIDs: string[] // Array of ingredient IDs with quantities
-  ingredients: RecipeIngredient[] // Populated ingredient data
+  ingredientIDs: string[]
+  ingredients: RecipeIngredient[]
   isGlutenFree: boolean
   isLactoseFree: boolean
+  createdAt: Date
+  updatedAt: Date
+}
+
+// API response shape — Recipe document enriched with computed relational fields
+export interface RecipeResponse extends Omit<Recipe, '_id'> {
+  id: string
+  favoriteCount: number
+  averageRating: number | null
+  totalRatings: number
+  createdBy?: string
+}
+
+// Relation document types (stored in their own collections)
+
+export interface Follow {
+  _id?: ObjectId
+  followerId: string   // user doing the following
+  followingId: string  // user being followed
+  createdAt: Date
+}
+
+export interface Favorite {
+  _id?: ObjectId
+  userId: string
+  recipeId: string
+  createdAt: Date
+}
+
+export interface Rating {
+  _id?: ObjectId
+  userId: string
+  recipeId: string
+  rating: number
   createdAt: Date
   updatedAt: Date
 }
@@ -49,8 +78,8 @@ export interface Recipe {
 export interface RecipeIngredient {
   ingredientId: string
   quantity: number
-  unit: string // e.g., "cups", "grams", "pieces"
-  ingredient?: Ingredient // Populated ingredient data
+  unit: string
+  ingredient?: Ingredient
 }
 
 export interface Ingredient {
@@ -59,11 +88,11 @@ export interface Ingredient {
   name: string
   isLiquid: boolean
   isCountable: boolean
-  caloriesPerUnit: number // per gram/ml for weight/volume, per piece for countable
+  caloriesPerUnit: number
   proteinPerUnit: number
   carbsPerUnit: number
-  defaultUnit: string // "grams", "ml", "pieces", etc.
-  category?: string // "vegetable", "protein", "grain", etc.
+  defaultUnit: string
+  category?: string
 }
 
 export interface SearchFilters {
@@ -86,7 +115,7 @@ export interface SearchFilters {
 }
 
 export interface AuthUser {
-  id?: number
+  id?: string
   email: string
   name?: string
   avatar?: string
@@ -113,25 +142,14 @@ export interface RecipeFormData {
   isLactoseFree: boolean
 }
 
-export interface UserProfile {
-  id: string
-  name: string
-  bio?: string
-  avatar?: string
-  followersCount: number
-  followingCount: number
-  recipesCount: number
-  isFollowing?: boolean
-}
-
-export interface Error {
+export interface AppError {
   statusCode: number
   statusMessage: string
 }
 
-export interface response {
+export interface AppResponse {
   success?: boolean
-  error?: Error
+  error?: AppError
   user?: AuthUser
 }
 

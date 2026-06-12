@@ -73,23 +73,24 @@ export default defineEventHandler(async (event) => {
             id: { $toString: '$_id' },
             createdBy: { $arrayElemAt: ['$creator.name', 0] },
             favoriteCount: { $size: '$favoriteDocs' },
-            rating: {
+            averageRating: {
               $cond: {
                 if: { $gt: [{ $size: '$ratingDocs' }, 0] },
                 then: { $round: [{ $divide: [{ $sum: '$ratingDocs.rating' }, { $size: '$ratingDocs' }] }, 1] },
                 else: null
               }
-            }
+            },
+            totalRatings: { $size: '$ratingDocs' }
           }
         },
         {
           $project: {
             _id: 0, id: 1, title: 1, description: 1, calories: 1, protein: 1, carbs: 1,
-            rating: 1, difficultyRating: 1, favoriteCount: 1, createdBy: 1, createdByID: 1,
-            isGlutenFree: 1, isLactoseFree: 1, createdAt: 1
+            averageRating: 1, totalRatings: 1, difficultyRating: 1, favoriteCount: 1,
+            createdBy: 1, createdByID: 1, isGlutenFree: 1, isLactoseFree: 1, createdAt: 1
           }
         },
-        { $sort: { favoriteCount: -1, rating: -1 } }
+        { $sort: { favoriteCount: -1, averageRating: -1 } }
       ])
       .toArray()
 

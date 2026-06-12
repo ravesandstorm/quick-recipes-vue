@@ -79,7 +79,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Recipe, User } from '../../../../types'
+import type { User, RecipeResponse } from '../../../../types'
 
 const route = useRoute()
 const { user: currentUser } = useSimpleAuth()
@@ -88,7 +88,7 @@ const userId = route.params.id as string
 
 const loading = ref(true)
 const userProfile = ref<User | null>(null)
-const recipes = ref<Recipe[]>([])
+const recipes = ref<RecipeResponse[]>([])
 
 const isOwnProfile = computed(() => {
   return currentUser.value?.id === userId
@@ -106,7 +106,7 @@ const fetchUserProfile = async () => {
 const fetchUserRecipes = async () => {
   try {
     loading.value = true
-    const { data } = await $fetch(`/api/users/${userId}/recipes`) as { success: boolean, data: Recipe[] }
+    const { data } = await $fetch(`/api/users/${userId}/recipes`) as { success: boolean, data: RecipeResponse[] }
     recipes.value = data || []
   } catch (error) {
     console.error('Error fetching user recipes:', error)

@@ -1,7 +1,7 @@
 
 import { ObjectId } from 'mongodb'
 import { connectToDatabase, getCollection } from '../../utils/db'
-import type { Error } from '../../../types'
+import type { AppError } from '../../../types'
 
 export default defineEventHandler(async (event) => {
   try {
@@ -54,15 +54,13 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    // Transform user data for response
+    // Return only the updatable fields
     const userData = {
       id: updatedUser._id.toString(),
       email: updatedUser.email,
       name: updatedUser.name,
       bio: updatedUser.bio,
-      followers: updatedUser.followers || [],
-      following: updatedUser.following || [],
-      createdRecipes: updatedUser.createdRecipes || []
+      avatar: updatedUser.avatar
     }
 
     return {
@@ -70,7 +68,7 @@ export default defineEventHandler(async (event) => {
       data: userData
     }
   } catch (error: unknown) {
-    if ((error as Error).statusCode) {
+    if ((error as AppError).statusCode) {
       throw error
     }
     

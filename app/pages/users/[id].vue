@@ -229,7 +229,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Recipe, User } from '../../../types'
+import type { RecipeResponse, UserProfile } from '../../../types'
 
 const route = useRoute()
 const { user: currentUser } = useSimpleAuth()
@@ -242,9 +242,9 @@ const favoritesLoading = ref(false)
 const followLoading = ref(false)
 const editMode = ref(false)
 const updating = ref(false)
-const userProfile = ref<User | null>(null)
-const userRecipes = ref<Recipe[]>([])
-const userFavorites = ref<Recipe[]>([])
+const userProfile = ref<UserProfile | null>(null)
+const userRecipes = ref<RecipeResponse[]>([])
+const userFavorites = ref<RecipeResponse[]>([])
 const isFollowing = ref(false)
 const profileTab = ref<'recipes' | 'favorites'>('recipes')
 
@@ -266,7 +266,20 @@ const isOwnProfile = computed(() => {
 const fetchUserProfile = async () => {
   try {
     loading.value = true
-    const { data } = await $fetch(`/api/users/${userId}`) as { success: boolean, data: User }
+    const { data } = await $fetch(`/api/users/${userId}`) as {
+      success: boolean
+      data: {
+        id: string
+        name: string
+        email: string
+        bio?: string
+        avatar?: string
+        followersCount: number
+        followingCount: number
+        recipesCount: number
+        isFollowing: boolean
+      }
+    }
     userProfile.value = data
 
     // Update edit form if own profile
@@ -275,16 +288,16 @@ const fetchUserProfile = async () => {
       editForm.bio = data.bio || ''
     }
 
-    // Update stats
+    // Update stats from computed counts returned by API
     stats.value = {
-      recipesCount: data.createdRecipes?.length || 0,
-      followersCount: data.followers?.length || 0,
-      followingCount: data.following?.length || 0
+      recipesCount: data.recipesCount ?? 0,
+      followersCount: data.followersCount ?? 0,
+      followingCount: data.followingCount ?? 0
     }
 
-    // Check if current user is following this user
-    if (currentUser.value && !isOwnProfile.value) {
-      isFollowing.value = data.followers?.includes(currentUser.value.id) || false
+    // isFollowing returned directly from the API
+    if (!isOwnProfile.value) {
+      isFollowing.value = data.isFollowing ?? false
     }
 
   } catch (error: any) {
@@ -301,7 +314,7 @@ const fetchUserProfile = async () => {
 const fetchUserRecipes = async () => {
   try {
     recipesLoading.value = true
-    const { data } = await $fetch(`/api/users/${userId}/recipes`) as { success: boolean, data: Recipe[] }
+    const { data } = await $fetch(`/api/users/${userId}/recipes`) as { success: boolean, data: RecipeResponse[] }
     userRecipes.value = data || []
   } catch (error) {
     console.error('Error fetching user recipes:', error)
@@ -340,7 +353,7 @@ const updateProfile = async () => {
     const { data } = await $fetch(`/api/users/${userId}`, {
       method: 'PATCH',
       body: editForm
-    }) as { success: boolean, data: User }
+    }) as { success: boolean, data: UserProfile }
 
     userProfile.value = { ...userProfile.value, ...data }
     editMode.value = false
@@ -355,7 +368,7 @@ const updateProfile = async () => {
 const fetchUserFavorites = async () => {
   try {
     favoritesLoading.value = true
-    const { data } = await $fetch(`/api/users/${userId}/favorites`) as { success: boolean, data: Recipe[] }
+    const { data } = await $fetch(`/api/users/${userId}/favorites`) as { success: boolean, data: RecipeResponse[] }
     userFavorites.value = data || []
   } catch (error) {
     console.error('Error fetching user favorites:', error)

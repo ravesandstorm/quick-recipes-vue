@@ -148,8 +148,8 @@ const fetchFollowing = async () => {
         let isFollowing = isOwnProfile.value
         if (!isOwnProfile.value && currentUser.value && followedUser.id !== currentUser.value.id) {
           try {
-            const currentUserData = await $fetch(`/api/users/${currentUser.value.id}`) as { success: boolean, data: User }
-            isFollowing = currentUserData.data.following?.includes(followedUser.id) || false
+            const followData = await $fetch(`/api/users/${followedUser.id}`) as { data: { isFollowing: boolean } }
+            isFollowing = followData.data.isFollowing ?? false
           } catch (error) {
             console.error('Error checking follow status:', error)
           }
@@ -159,7 +159,7 @@ const fetchFollowing = async () => {
           ...followedUser,
           isFollowing,
           followLoading: false,
-          recipesCount: followedUser.createdRecipes?.length || 0
+          recipesCount: followedUser.recipesCount ?? 0
         }
       })
     )
