@@ -12,7 +12,7 @@ export interface User {
   followers: string[] // Array of user IDs
   following: string[] // Array of user IDs
   createdRecipes: string[] // Array of recipe IDs
-  favRecipes: string[] // Array of recipe IDs
+  // favRecipes removed — favorites now stored in the 'favorites' collection
 }
 
 export interface UserProfile {

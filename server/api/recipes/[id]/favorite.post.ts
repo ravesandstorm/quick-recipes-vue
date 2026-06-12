@@ -3,7 +3,6 @@ import { connectToDatabase, getCollection } from '../../../utils/db'
 
 export default defineEventHandler(async (event) => {
   try {
-    // Get authenticated user from context (set by auth middleware)
     const user = event.context.user
 
     if (!user || !user.userId) {
@@ -24,84 +23,38 @@ export default defineEventHandler(async (event) => {
     }
 
     await connectToDatabase()
-    const users = getCollection('users')
     const recipes = getCollection('recipes')
+    const favorites = getCollection('favorites')
 
-    // Check if recipe exists
+    // Verify recipe exists
     const recipe = await recipes.findOne({ _id: new ObjectId(recipeId) })
     if (!recipe) {
-      throw createError({
-        statusCode: 404,
-        statusMessage: 'Recipe not found'
-      })
+      throw createError({ statusCode: 404, statusMessage: 'Recipe not found' })
     }
 
-    // Get user's current favorites
-    const userDoc = await users.findOne({ _id: new ObjectId(userId) })
-    if (!userDoc) {
-      throw createError({
-        statusCode: 404,
-        statusMessage: 'User not found'
-      })
-    }
-
-    const favorites = userDoc.favRecipes || []
-    const isFavorited = favorites.includes(recipeId)
+    // Check current favorite state
+    const existing = await favorites.findOne({ userId, recipeId })
+    const isFavorited = !!existing
 
     if (isFavorited) {
-      // Remove from favorites
-      await users.updateOne(
-        { _id: new ObjectId(userId) },
-        {
-          $pull: { favRecipes: recipeId },
-          $set: { updatedAt: new Date() }
-        }
-      )
-      
-      // Decrease favorite count
-      await recipes.updateOne(
-        { _id: new ObjectId(recipeId) },
-        { 
-          $inc: { favoriteCount: -1 },
-          $set: { updatedAt: new Date() }
-        }
-      )
+      await favorites.deleteOne({ userId, recipeId })
     } else {
-      // Add to favorites
-      await users.updateOne(
-        { _id: new ObjectId(userId) },
-        {
-          $addToSet: { favRecipes: recipeId },
-          $set: { updatedAt: new Date() }
-        }
-      )
-      
-      // Increase favorite count
-      await recipes.updateOne(
-        { _id: new ObjectId(recipeId) },
-        { 
-          $inc: { favoriteCount: 1 },
-          $set: { updatedAt: new Date() }
-        }
-      )
+      await favorites.insertOne({ userId, recipeId, createdAt: new Date() })
     }
+
+    // Compute live count from favorites table
+    const favoritesCount = await favorites.countDocuments({ recipeId })
 
     return {
       success: true,
       data: {
         isFavorited: !isFavorited,
-        favoriteCount: recipe.favoriteCount + (isFavorited ? -1 : 1)
+        favoriteCount: favoritesCount
       }
     }
-  } catch (error: unknown) {
-    if ((error as any).statusCode) {
-      throw error
-    }
-    
+  } catch (error: any) {
+    if (error.statusCode) throw error
     console.error('Error toggling favorite:', error)
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Internal server error'
-    })
+    throw createError({ statusCode: 500, statusMessage: 'Internal server error' })
   }
 })

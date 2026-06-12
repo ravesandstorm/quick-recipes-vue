@@ -25,11 +25,11 @@
       <!-- Dietary Restriction Badges -->
       <div class="absolute bottom-3 left-3 flex space-x-1">
         <span v-if="recipe.isGlutenFree" class="px-2 py-1 bg-green-600 text-white text-xs font-medium rounded-full flex items-center space-x-1">
-          <span>🌾</span>
+          <Icon name="lucide:wheat-off" class="w-3 h-3" />
           <span>GF</span>
         </span>
         <span v-if="recipe.isLactoseFree" class="px-2 py-1 bg-blue-600 text-white text-xs font-medium rounded-full flex items-center space-x-1">
-          <span>🥛</span>
+          <Icon name="lucide:milk-off" class="w-3 h-3" />
           <span>LF</span>
         </span>
       </div>
@@ -55,18 +55,18 @@
       </p>
 
       <!-- Recipe Stats -->
-      <div class="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400 mb-4">
+      <div class="flex flex-wrap items-center justify-between gap-y-1 text-sm text-gray-500 dark:text-gray-400 mb-4">
         <div class="flex items-center space-x-3">
           <div class="flex items-center space-x-1">
-            <span>🔥</span>
+            <Icon name="lucide:flame" class="w-4 h-4 text-orange-500" />
             <span>{{ recipe.calories }} cal</span>
           </div>
           <div class="flex items-center space-x-1">
-            <span>💪</span>
+            <Icon name="lucide:dumbbell" class="w-4 h-4 text-blue-500" />
             <span>{{ recipe.protein }}g</span>
           </div>
           <div class="flex items-center space-x-1">
-            <span>🍞</span>
+            <Icon name="lucide:wheat" class="w-4 h-4 text-yellow-600" />
             <span>{{ recipe.carbs }}g</span>
           </div>
         </div>

@@ -28,7 +28,7 @@
             Search
           </button>
           <button
-            @click="showAdvanced = !showAdvanced"
+            @click="toggleAdvanced"
             class="btn-secondary flex-1 sm:flex-none"
           >
             Advanced
@@ -135,11 +135,11 @@
             <div class="space-y-2">
               <label class="flex items-center space-x-2 cursor-pointer">
                 <input v-model="filters.isGlutenFree" type="checkbox" class="w-4 h-4 text-blue-600 rounded border-gray-300 dark:border-gray-600 focus:ring-blue-500" />
-                <span class="text-sm text-gray-700 dark:text-gray-300">🌾 Gluten Free</span>
+                <span class="flex items-center space-x-1 text-sm text-gray-700 dark:text-gray-300"><Icon name="lucide:wheat-off" class="w-4 h-4 text-green-600" /><span>Gluten Free</span></span>
               </label>
               <label class="flex items-center space-x-2 cursor-pointer">
                 <input v-model="filters.isLactoseFree" type="checkbox" class="w-4 h-4 text-blue-600 rounded border-gray-300 dark:border-gray-600 focus:ring-blue-500" />
-                <span class="text-sm text-gray-700 dark:text-gray-300">🥛 Lactose Free</span>
+                <span class="flex items-center space-x-1 text-sm text-gray-700 dark:text-gray-300"><Icon name="lucide:milk-off" class="w-4 h-4 text-blue-600" /><span>Lactose Free</span></span>
               </label>
             </div>
           </div>
@@ -285,6 +285,16 @@ const searchSuggestions = [
   'Low carb',
   'High protein'
 ]
+
+const toggleAdvanced = () => {
+  showAdvanced.value = !showAdvanced.value
+  if (showAdvanced.value) {
+    recipes.value = []
+    searchPerformed.value = false
+    totalResults.value = 0
+    currentPage.value = 1
+  }
+}
 
 const performSearch = async (loadMore = false) => {
   if (!loadMore) {

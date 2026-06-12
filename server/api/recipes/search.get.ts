@@ -64,10 +64,11 @@ export default defineEventHandler(async (event) => {
       pipeline.push({ $match: matchStage })
     }
     
-    // Convert createdByID string to ObjectId for lookup
+    // Prepare string ID and ObjectId for lookups
     pipeline.push({
       $addFields: {
-        createdByIDObj: { $toObjectId: '$createdByID' }
+        createdByIDObj: { $toObjectId: '$createdByID' },
+        recipeIdStr: { $toString: '$_id' }
       }
     })
 
@@ -81,11 +82,38 @@ export default defineEventHandler(async (event) => {
       }
     })
 
+    // Lookup favorites and ratings from relational tables
+    pipeline.push({
+      $lookup: {
+        from: 'favorites',
+        localField: 'recipeIdStr',
+        foreignField: 'recipeId',
+        as: 'favoriteDocs'
+      }
+    })
+
+    pipeline.push({
+      $lookup: {
+        from: 'ratings',
+        localField: 'recipeIdStr',
+        foreignField: 'recipeId',
+        as: 'ratingDocs'
+      }
+    })
+
     // Add computed fields
     pipeline.push({
       $addFields: {
         id: { $toString: '$_id' },
         createdBy: { $arrayElemAt: ['$creator.name', 0] },
+        favoriteCount: { $size: '$favoriteDocs' },
+        rating: {
+          $cond: {
+            if: { $gt: [{ $size: '$ratingDocs' }, 0] },
+            then: { $round: [{ $divide: [{ $sum: '$ratingDocs.rating' }, { $size: '$ratingDocs' }] }, 1] },
+            else: null
+          }
+        },
         score: query.query ? { $meta: 'textScore' } : 1
       }
     })

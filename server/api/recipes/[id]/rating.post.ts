@@ -73,20 +73,9 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    // Calculate new average rating
+    // Compute average live from ratings table (not cached on recipe document)
     const allRatings = await ratings.find({ recipeId: recipeId }).toArray()
     const averageRating = allRatings.reduce((sum, r) => sum + r.rating, 0) / allRatings.length
-
-    // Update recipe with new average rating
-    await recipes.updateOne(
-      { _id: new ObjectId(recipeId) },
-      { 
-        $set: { 
-          rating: Math.round(averageRating * 10) / 10, // Round to 1 decimal place
-          updatedAt: new Date()
-        }
-      }
-    )
 
     return {
       success: true,

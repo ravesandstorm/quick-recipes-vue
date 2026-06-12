@@ -2,6 +2,7 @@ import type { AuthUser } from '../../types'
 
 export const useSimpleAuth = () => {
   // useState ensures shared state across all component instances (SSR-safe)
+  // The auth.server.ts plugin pre-populates these on the server
   const user = useState<AuthUser | null>('auth-user', () => null)
   const status = useState<string>('auth-status', () => 'loading')
 
@@ -28,13 +29,10 @@ export const useSimpleAuth = () => {
     }
   }
 
-  // Only register onMounted when called inside a component context
-  if (getCurrentInstance()) {
-    onMounted(() => {
-      if (status.value === 'loading') {
-        checkAuth()
-      }
-    })
+  // Only call checkAuth on the client if the server plugin didn't resolve the state
+  // (e.g., during client-only navigation or if SSR was bypassed)
+  if (getCurrentInstance() && import.meta.client && status.value === 'loading') {
+    onMounted(checkAuth)
   }
 
   return {

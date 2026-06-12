@@ -21,31 +21,31 @@
       </button>
       <button
         @click="scrollToSection('macros')"
-        class="w-10 h-10 bg-white dark:bg-gray-800 shadow-lg rounded-full flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+        class="w-10 h-10 bg-white dark:bg-gray-800 shadow-lg rounded-full flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer"
         title="Go to nutrition"
       >
-        📊
+        <Icon name="lucide:bar-chart-2" class="w-5 h-5 text-gray-600 dark:text-gray-400" />
       </button>
       <button
         @click="scrollToSection('description')"
-        class="w-10 h-10 bg-white dark:bg-gray-800 shadow-lg rounded-full flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+        class="w-10 h-10 bg-white dark:bg-gray-800 shadow-lg rounded-full flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer"
         title="Go to description"
       >
-        📝
+        <Icon name="lucide:file-text" class="w-5 h-5 text-gray-600 dark:text-gray-400" />
       </button>
       <button
         @click="scrollToSection('ingredients')"
-        class="w-10 h-10 bg-white dark:bg-gray-800 shadow-lg rounded-full flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+        class="w-10 h-10 bg-white dark:bg-gray-800 shadow-lg rounded-full flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer"
         title="Go to ingredients"
       >
-        🥕
+        <Icon name="lucide:carrot" class="w-5 h-5 text-gray-600 dark:text-gray-400" />
       </button>
       <button
         @click="scrollToSection('instructions')"
-        class="w-10 h-10 bg-white dark:bg-gray-800 shadow-lg rounded-full flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+        class="w-10 h-10 bg-white dark:bg-gray-800 shadow-lg rounded-full flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer"
         title="Go to instructions"
       >
-        👨‍🍳
+        <Icon name="lucide:chef-hat" class="w-5 h-5 text-gray-600 dark:text-gray-400" />
       </button>
       <button
         @click="scrollToSection('instructions')"
@@ -71,11 +71,11 @@
               <span>{{ recipe.rating || 'Not rated' }}</span>
             </div>
             <div v-if="recipe.difficultyRating" class="flex items-center space-x-1">
-              <span>🎯</span>
+              <Icon name="lucide:target" class="w-4 h-4" />
               <span>{{ getDifficultyText(recipe.difficultyRating) }}</span>
             </div>
             <div class="flex items-center space-x-1">
-              <span>📅</span>
+              <Icon name="lucide:calendar" class="w-4 h-4" />
               <span>{{ formatDate(recipe.createdAt) }}</span>
             </div>
           </div>
@@ -199,11 +199,11 @@
                 <span class="text-green-600 text-sm font-medium">{{ index + 1 }}</span>
               </div>
               <div>
-                <div class="font-medium text-gray-900">{{ ingredient.ingredient?.name || 'Unknown ingredient' }}</div>
-                <div class="text-sm text-gray-600">{{ ingredient.quantity }} {{ ingredient.unit }}</div>
+                <div class="font-medium text-gray-900 dark:text-gray-100">{{ ingredient.ingredient?.name || 'Unknown ingredient' }}</div>
+                <div class="text-sm text-gray-600 dark:text-gray-400">{{ ingredient.quantity }} {{ ingredient.unit }}</div>
               </div>
             </div>
-            <div class="text-sm text-gray-500">
+            <div class="text-sm text-gray-500 dark:text-gray-400">
               {{ Math.round((ingredient.ingredient?.caloriesPerUnit || 0) * ingredient.quantity) }} cal
             </div>
           </div>
@@ -214,7 +214,7 @@
     <!-- Instructions Section -->
     <section id="instructions" class="mb-8">
       <div class="card">
-        <h2 class="text-xl font-semibold text-gray-900 mb-6">Instructions</h2>
+        <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-6">Instructions</h2>
         <div class="space-y-6">
           <div
             v-for="(instruction, index) in recipe.instructions"
@@ -225,7 +225,7 @@
               {{ index + 1 }}
             </div>
             <div class="flex-1">
-              <p class="text-gray-700 leading-relaxed">{{ instruction }}</p>
+              <p class="text-gray-700 dark:text-gray-300 leading-relaxed">{{ instruction }}</p>
             </div>
           </div>
         </div>
@@ -258,30 +258,13 @@ import type { Recipe } from '../../../types'
 const route = useRoute()
 const recipeId = route.params.id as string
 
-// Get user authentication
-const user = ref<{ id: string } | null>(null)
+const { user } = useSimpleAuth()
 const isFavorited = ref(false)
 const userRating = ref<number | null>(null)
 const favoriteLoading = ref(false)
 const ratingLoading = ref(false)
 const showSuccessMessage = ref(false)
 const successMessage = ref('')
-
-// Initialize user data and check favorites/ratings
-onMounted(async () => {
-  try {
-    const localData = localStorage.getItem('user')
-    user.value = localData ? JSON.parse(localData) : null
-
-    // Check if user has favorited this recipe and get their rating
-    if (user.value && recipe.value) {
-      await checkUserInteractions()
-    }
-  } catch (error) {
-    console.error('Error reading user data from localStorage:', error)
-    user.value = null
-  }
-})
 
 const checkUserInteractions = async () => {
   if (!user.value) return
@@ -308,6 +291,13 @@ const { data: recipeResponse, pending } = await useFetch<{success: boolean, data
 
 // Extract the actual recipe data
 const recipe = computed(() => recipeResponse.value?.data)
+
+// Load user interactions once both user and recipe are available
+watch(user, async (newUser) => {
+  if (newUser && recipe.value) {
+    await checkUserInteractions()
+  }
+}, { immediate: true })
 
 const scrollToSection = (sectionId: string) => {
   const element = document.getElementById(sectionId)

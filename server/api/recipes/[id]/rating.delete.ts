@@ -1,4 +1,3 @@
-import { ObjectId } from 'mongodb'
 import { connectToDatabase, getCollection } from '../../../utils/db'
 import { getAuthenticatedUser } from '../../../utils/auth'
 
@@ -24,7 +23,6 @@ export default defineEventHandler(async (event) => {
   try {
     await connectToDatabase()
     const ratings = getCollection('ratings')
-    const recipes = getCollection('recipes')
 
     // Delete the user's rating (recipeId and userId are stored as strings)
     const deleteResult = await ratings.deleteOne({
@@ -39,23 +37,12 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    // Recalculate average rating
+    // Recompute average live from ratings table (not cached on recipe document)
     const allRatings = await ratings.find({ recipeId: recipeId }).toArray()
     const totalRatings = allRatings.length
     const averageRating = totalRatings > 0
       ? allRatings.reduce((sum, r) => sum + r.rating, 0) / totalRatings
       : 0
-
-    // Update recipe with new average rating
-    await recipes.updateOne(
-      { _id: new ObjectId(recipeId) },
-      {
-        $set: {
-          rating: Math.round(averageRating * 10) / 10,
-          numberOfRatings: totalRatings
-        }
-      }
-    )
 
     return {
       success: true,

@@ -50,7 +50,15 @@ async function createIndexes() {
     // Ingredient indexes
     await db.collection('ingredients').createIndex({ name: 'text' })
     await db.collection('ingredients').createIndex({ name: 1 })
-    
+
+    // Favorites (relational table — replaces user.favRecipes array and recipe.favoriteCount)
+    await db.collection('favorites').createIndex({ userId: 1, recipeId: 1 }, { unique: true })
+    await db.collection('favorites').createIndex({ recipeId: 1 })
+
+    // Ratings (relational table)
+    await db.collection('ratings').createIndex({ userId: 1, recipeId: 1 }, { unique: true })
+    await db.collection('ratings').createIndex({ recipeId: 1 })
+
     console.log('Database indexes created successfully')
   } catch (error) {
     console.error('Error creating indexes:', error)

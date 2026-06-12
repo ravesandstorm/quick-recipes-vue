@@ -55,8 +55,8 @@
                 :class="[
                   'px-6 py-2 rounded-lg font-medium transition-colors',
                   isFollowing
-                    ? 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                    : 'bg-blue-600 text-white hover:bg-blue-700'
+                    ? 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                    : 'bg-violet-600 text-white hover:bg-violet-700'
                 ]"
               >
                 <span v-if="followLoading">...</span>
@@ -148,7 +148,7 @@
               :class="[
                 'py-2 px-1 border-b-2 font-medium text-sm',
                 profileTab === 'recipes'
-                  ? 'border-blue-500 text-blue-600'
+                  ? 'border-violet-500 text-violet-600 dark:text-violet-400'
                   : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:border-gray-300 dark:hover:border-gray-500'
               ]"
             >
@@ -159,7 +159,7 @@
               :class="[
                 'py-2 px-1 border-b-2 font-medium text-sm',
                 profileTab === 'favorites'
-                  ? 'border-blue-500 text-blue-600'
+                  ? 'border-violet-500 text-violet-600 dark:text-violet-400'
                   : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:border-gray-300 dark:hover:border-gray-500'
               ]"
             >
