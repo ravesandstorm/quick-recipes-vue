@@ -21,31 +21,31 @@
       </button>
       <button
         @click="scrollToSection('macros')"
-        class="w-10 h-10 bg-white dark:bg-gray-800 shadow-lg rounded-full flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+        class="w-10 h-10 bg-white dark:bg-gray-800 shadow-lg rounded-full flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer"
         title="Go to nutrition"
       >
-        📊
+        <Icon name="lucide:bar-chart-2" class="w-5 h-5 text-gray-600 dark:text-gray-400" />
       </button>
       <button
         @click="scrollToSection('description')"
-        class="w-10 h-10 bg-white dark:bg-gray-800 shadow-lg rounded-full flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+        class="w-10 h-10 bg-white dark:bg-gray-800 shadow-lg rounded-full flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer"
         title="Go to description"
       >
-        📝
+        <Icon name="lucide:file-text" class="w-5 h-5 text-gray-600 dark:text-gray-400" />
       </button>
       <button
         @click="scrollToSection('ingredients')"
-        class="w-10 h-10 bg-white dark:bg-gray-800 shadow-lg rounded-full flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+        class="w-10 h-10 bg-white dark:bg-gray-800 shadow-lg rounded-full flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer"
         title="Go to ingredients"
       >
-        🥕
+        <Icon name="lucide:carrot" class="w-5 h-5 text-gray-600 dark:text-gray-400" />
       </button>
       <button
         @click="scrollToSection('instructions')"
-        class="w-10 h-10 bg-white dark:bg-gray-800 shadow-lg rounded-full flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+        class="w-10 h-10 bg-white dark:bg-gray-800 shadow-lg rounded-full flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer"
         title="Go to instructions"
       >
-        👨‍🍳
+        <Icon name="lucide:chef-hat" class="w-5 h-5 text-gray-600 dark:text-gray-400" />
       </button>
       <button
         @click="scrollToSection('instructions')"
@@ -68,14 +68,15 @@
               <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
               </svg>
-              <span>{{ recipe.rating || 'Not rated' }}</span>
+              <span>{{ averageRating ?? 'Not rated' }}</span>
+              <span v-if="totalRatings > 0" class="text-gray-400">({{ totalRatings }})</span>
             </div>
             <div v-if="recipe.difficultyRating" class="flex items-center space-x-1">
-              <span>🎯</span>
+              <Icon name="lucide:target" class="w-4 h-4" />
               <span>{{ getDifficultyText(recipe.difficultyRating) }}</span>
             </div>
             <div class="flex items-center space-x-1">
-              <span>📅</span>
+              <Icon name="lucide:calendar" class="w-4 h-4" />
               <span>{{ formatDate(recipe.createdAt) }}</span>
             </div>
           </div>
@@ -127,7 +128,7 @@
             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
               <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
             </svg>
-            <span>{{ favoriteLoading ? '...' : (recipe?.favoriteCount || 0) }}</span>
+            <span>{{ favoriteLoading ? '...' : favoriteCount }}</span>
           </button>
 
           <!-- Login prompt for favorites -->
@@ -135,7 +136,7 @@
             <svg class="w-5 h-5 text-gray-400 dark:text-gray-500" fill="currentColor" viewBox="0 0 24 24">
               <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
             </svg>
-            <span class="text-sm text-gray-500 dark:text-gray-400">{{ recipe?.favoriteCount || 0 }}</span>
+            <span class="text-sm text-gray-500 dark:text-gray-400">{{ favoriteCount }}</span>
           </div>
           
           <!-- Creator Info -->
@@ -199,11 +200,11 @@
                 <span class="text-green-600 text-sm font-medium">{{ index + 1 }}</span>
               </div>
               <div>
-                <div class="font-medium text-gray-900">{{ ingredient.ingredient?.name || 'Unknown ingredient' }}</div>
-                <div class="text-sm text-gray-600">{{ ingredient.quantity }} {{ ingredient.unit }}</div>
+                <div class="font-medium text-gray-900 dark:text-gray-100">{{ ingredient.ingredient?.name || 'Unknown ingredient' }}</div>
+                <div class="text-sm text-gray-600 dark:text-gray-400">{{ ingredient.quantity }} {{ ingredient.unit }}</div>
               </div>
             </div>
-            <div class="text-sm text-gray-500">
+            <div class="text-sm text-gray-500 dark:text-gray-400">
               {{ Math.round((ingredient.ingredient?.caloriesPerUnit || 0) * ingredient.quantity) }} cal
             </div>
           </div>
@@ -214,7 +215,7 @@
     <!-- Instructions Section -->
     <section id="instructions" class="mb-8">
       <div class="card">
-        <h2 class="text-xl font-semibold text-gray-900 mb-6">Instructions</h2>
+        <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-6">Instructions</h2>
         <div class="space-y-6">
           <div
             v-for="(instruction, index) in recipe.instructions"
@@ -225,7 +226,7 @@
               {{ index + 1 }}
             </div>
             <div class="flex-1">
-              <p class="text-gray-700 leading-relaxed">{{ instruction }}</p>
+              <p class="text-gray-700 dark:text-gray-300 leading-relaxed">{{ instruction }}</p>
             </div>
           </div>
         </div>
@@ -253,13 +254,12 @@
 </template>
 
 <script setup lang="ts">
-import type { Recipe } from '../../../types'
+import type { RecipeResponse } from '../../../types'
 
 const route = useRoute()
 const recipeId = route.params.id as string
 
-// Get user authentication
-const user = ref<{ id: string } | null>(null)
+const { user } = useSimpleAuth()
 const isFavorited = ref(false)
 const userRating = ref<number | null>(null)
 const favoriteLoading = ref(false)
@@ -267,36 +267,34 @@ const ratingLoading = ref(false)
 const showSuccessMessage = ref(false)
 const successMessage = ref('')
 
-// Initialize user data and check favorites/ratings
-onMounted(async () => {
-  try {
-    const localData = localStorage.getItem('user')
-    user.value = localData ? JSON.parse(localData) : null
+// Local optimistic state — hydrated from recipe load, updated locally on interactions
+const averageRating = ref<number | null>(null)
+const totalRatings = ref(0)
+const favoriteCount = ref(0)
 
-    // Check if user has favorited this recipe and get their rating
-    if (user.value && recipe.value) {
-      await checkUserInteractions()
-    }
-  } catch (error) {
-    console.error('Error reading user data from localStorage:', error)
-    user.value = null
+const { data: recipeResponse, pending } = await useFetch<{success: boolean, data: RecipeResponse}>(`/api/recipes/${recipeId}`)
+const recipe = computed(() => recipeResponse.value?.data)
+
+// Hydrate local stats from the page-load aggregate
+watch(recipe, (r) => {
+  if (r) {
+    averageRating.value = r.averageRating ?? null
+    totalRatings.value = r.totalRatings ?? 0
+    favoriteCount.value = r.favoriteCount ?? 0
   }
-})
+}, { immediate: true })
 
+// Check user-specific interactions once auth state is confirmed
 const checkUserInteractions = async () => {
   if (!user.value) return
-
   try {
-    // Check if recipe is favorited (auth handled by server middleware via cookies)
-    const { data: userFavorites } = await $fetch<{success: boolean, data: string[]}>(`/api/users/me/favorites`)
-    isFavorited.value = userFavorites.includes(recipeId)
+    const { data: favIds } = await $fetch<{success: boolean, data: string[]}>(`/api/users/me/favorites`)
+    isFavorited.value = favIds.includes(recipeId)
 
-    // Get user's rating for this recipe (auth handled by server middleware via cookies)
     try {
       const { data: ratingData } = await $fetch<{success: boolean, data: {rating: number}}>(`/api/recipes/${recipeId}/user-rating`)
       userRating.value = ratingData.rating
-    } catch (error) {
-      // User hasn't rated this recipe yet
+    } catch {
       userRating.value = null
     }
   } catch (error) {
@@ -304,10 +302,11 @@ const checkUserInteractions = async () => {
   }
 }
 
-const { data: recipeResponse, pending } = await useFetch<{success: boolean, data: Recipe}>(`/api/recipes/${recipeId}`)
-
-// Extract the actual recipe data
-const recipe = computed(() => recipeResponse.value?.data)
+watch(user, async (newUser) => {
+  if (newUser && recipe.value) {
+    await checkUserInteractions()
+  }
+}, { immediate: true })
 
 const scrollToSection = (sectionId: string) => {
   const element = document.getElementById(sectionId)
@@ -316,117 +315,78 @@ const scrollToSection = (sectionId: string) => {
   }
 }
 
+const showMessage = (msg: string) => {
+  showSuccessMessage.value = true
+  successMessage.value = msg
+  setTimeout(() => { showSuccessMessage.value = false }, 3000)
+}
+
 const toggleFavorite = async () => {
-  if (!user.value || !recipe.value) {
-    console.log('Cannot toggle favorite: user or recipe not available')
-    return
-  }
+  if (!user.value || !recipe.value) return
 
   try {
     favoriteLoading.value = true
-    console.log('Toggling favorite for recipe:', recipeId)
-
-    // Auth handled by server middleware via cookies
-    const response = await $fetch<{success: boolean, data: {isFavorited: boolean, favoriteCount: number}}>(`/api/recipes/${recipeId}/favorite`, {
-      method: 'POST'
-    })
-
-    console.log('Favorite toggle response:', response)
-
+    const response = await $fetch<{success: boolean, data: {isFavorited: boolean, favoriteCount: number}}>(
+      `/api/recipes/${recipeId}/favorite`,
+      { method: 'POST' }
+    )
     isFavorited.value = response.data.isFavorited
-    // Update the recipe's favorite count
-    if (recipe.value) {
-      recipe.value.favoriteCount = response.data.favoriteCount
-    }
-
-    // Show success message
-    showSuccessMessage.value = true
-    successMessage.value = response.data.isFavorited ? 'Added to favorites!' : 'Removed from favorites!'
-    setTimeout(() => {
-      showSuccessMessage.value = false
-    }, 3000)
+    favoriteCount.value = response.data.favoriteCount
+    showMessage(response.data.isFavorited ? 'Added to favorites!' : 'Removed from favorites!')
   } catch (error: any) {
     console.error('Error toggling favorite:', error)
-    console.error('Error details:', error?.data || error?.message)
-
-    // Show error message
-    showSuccessMessage.value = true
-    successMessage.value = 'Failed to update favorite. Please try again.'
-    setTimeout(() => {
-      showSuccessMessage.value = false
-    }, 3000)
+    showMessage('Failed to update favorite. Please try again.')
   } finally {
     favoriteLoading.value = false
   }
 }
 
-const submitRating = async (rating: number) => {
-  if (!user.value || !recipe.value || ratingLoading.value) {
-    console.log('Cannot submit rating: user or recipe not available')
-    return
-  }
+const submitRating = async (star: number) => {
+  if (!user.value || !recipe.value || ratingLoading.value) return
 
   try {
     ratingLoading.value = true
 
-    // If clicking the same rating, remove it
-    if (userRating.value === rating) {
-      console.log('Removing rating for recipe:', recipeId)
-
-      const response = await $fetch<{success: boolean, data: {userRating: number | null, averageRating: number, totalRatings: number}}>(`/api/recipes/${recipeId}/rating`, {
-        method: 'DELETE',
-        credentials: 'include'
+    // Clicking the same star removes the rating
+    if (userRating.value === star) {
+      const prevRating = userRating.value
+      await $fetch<{success: boolean, data: {userRating: null}}>(`/api/recipes/${recipeId}/rating`, {
+        method: 'DELETE'
       })
 
-      console.log('Rating removal response:', response)
-
+      // Compute new average locally — no server aggregate needed
+      averageRating.value = totalRatings.value > 1
+        ? Math.round(((averageRating.value ?? 0) * totalRatings.value - prevRating) / (totalRatings.value - 1) * 10) / 10
+        : null
+      totalRatings.value = Math.max(0, totalRatings.value - 1)
       userRating.value = null
-      if (recipe.value) {
-        recipe.value.rating = response.data.averageRating
-      }
-
-      showSuccessMessage.value = true
-      successMessage.value = 'Rating removed!'
-      setTimeout(() => {
-        showSuccessMessage.value = false
-      }, 3000)
+      showMessage('Rating removed!')
     } else {
-      // Submit new rating
-      console.log('Submitting rating:', rating, 'for recipe:', recipeId)
+      const response = await $fetch<{success: boolean, data: {userRating: number, previousRating: number | null, isNew: boolean}}>(
+        `/api/recipes/${recipeId}/rating`,
+        { method: 'POST', body: { rating: star } }
+      )
 
-      const response = await $fetch<{success: boolean, data: {userRating: number, averageRating: number, totalRatings: number}}>(`/api/recipes/${recipeId}/rating`, {
-        method: 'POST',
-        credentials: 'include',
-        body: {
-          rating: rating
-        }
-      })
+      const { isNew, previousRating } = response.data
 
-      console.log('Rating response:', response)
-
-      userRating.value = response.data.userRating
-      // Update the recipe's average rating
-      if (recipe.value) {
-        recipe.value.rating = response.data.averageRating
+      // Compute new average locally from server-returned metadata
+      if (isNew) {
+        averageRating.value = Math.round(
+          ((averageRating.value ?? 0) * totalRatings.value + star) / (totalRatings.value + 1) * 10
+        ) / 10
+        totalRatings.value++
+      } else {
+        averageRating.value = Math.round(
+          ((averageRating.value ?? 0) * totalRatings.value - (previousRating ?? 0) + star) / totalRatings.value * 10
+        ) / 10
       }
 
-      // Show success message
-      showSuccessMessage.value = true
-      successMessage.value = `Rated ${rating} star${rating > 1 ? 's' : ''}!`
-      setTimeout(() => {
-        showSuccessMessage.value = false
-      }, 3000)
+      userRating.value = star
+      showMessage(`Rated ${star} star${star > 1 ? 's' : ''}!`)
     }
   } catch (error: any) {
     console.error('Error submitting rating:', error)
-    console.error('Error details:', error?.data || error?.message)
-
-    // Show error message
-    showSuccessMessage.value = true
-    successMessage.value = 'Failed to submit rating. Please try again.'
-    setTimeout(() => {
-      showSuccessMessage.value = false
-    }, 3000)
+    showMessage('Failed to submit rating. Please try again.')
   } finally {
     ratingLoading.value = false
   }
@@ -439,14 +399,9 @@ const getDifficultyText = (rating: number) => {
 }
 
 const formatDate = (date: string | Date) => {
-  return new Date(date).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  })
+  return new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
 }
 
-// Set page title
 useHead({
   title: recipe.value?.title ? `${recipe.value.title} - Quick Recipes` : 'Recipe - Quick Recipes'
 })

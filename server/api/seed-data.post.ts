@@ -3,6 +3,13 @@ import bcrypt from 'bcryptjs'
 import type { User, Recipe, Ingredient } from '../../types'
 
 export default defineEventHandler(async (event) => {
+  if (process.env.NODE_ENV === 'production') {
+    throw createError({
+      statusCode: 403,
+      statusMessage: 'Seed data endpoint is disabled in production'
+    })
+  }
+
   try {
     await connectToDatabase()
     

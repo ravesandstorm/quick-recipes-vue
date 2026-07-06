@@ -2,7 +2,7 @@
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <!-- Search Header -->
     <div class="mb-8">
-      <h1 class="text-3xl font-bold text-gray-900 mb-4">Search Recipes</h1>
+      <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">Search Recipes</h1>
       
       <!-- Main Search Bar -->
       <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 mb-4">
@@ -12,7 +12,7 @@
             @keyup.enter="() => performSearch()"
             type="text"
             placeholder="Search for recipes..."
-            class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg"
+            class="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg placeholder-gray-400 dark:placeholder-gray-500"
           />
           <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <svg class="h-6 w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -28,7 +28,7 @@
             Search
           </button>
           <button
-            @click="showAdvanced = !showAdvanced"
+            @click="toggleAdvanced"
             class="btn-secondary flex-1 sm:flex-none"
           >
             Advanced
@@ -38,18 +38,18 @@
       
       <!-- Advanced Filters -->
       <div v-if="showAdvanced" class="card animate-slide-up">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">Advanced Filters</h3>
-        
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Advanced Filters</h3>
+
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <!-- Available Ingredients -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Available Ingredients</label>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Available Ingredients</label>
             <IngredientMultiSelect v-model="filters.ingredients" />
           </div>
           
           <!-- Rating Filter -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Minimum Rating</label>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Minimum Rating</label>
             <select v-model="filters.minRating" class="input-field">
               <option value="">Any rating</option>
               <option value="4">4+ stars</option>
@@ -60,7 +60,7 @@
           
           <!-- Calorie Range -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Calorie Range</label>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Calorie Range</label>
             <div class="flex space-x-2">
               <input
                 v-model.number="filters.minCalories"
@@ -79,7 +79,7 @@
           
           <!-- Protein Range -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Protein Range (g)</label>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Protein Range (g)</label>
             <div class="flex space-x-2">
               <input
                 v-model.number="filters.minProtein"
@@ -98,7 +98,7 @@
           
           <!-- Carbs Range -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Carbs Range (g)</label>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Carbs Range (g)</label>
             <div class="flex space-x-2">
               <input
                 v-model.number="filters.minCarbs"
@@ -117,7 +117,7 @@
           
           <!-- Sort Options -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Sort By</label>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Sort By</label>
             <select v-model="filters.sortBy" class="input-field">
               <option value="relevance">Relevance</option>
               <option value="rating">Rating</option>
@@ -127,6 +127,21 @@
               <option value="carbs">Carbs</option>
               <option value="createdAt">Newest</option>
             </select>
+          </div>
+
+          <!-- Dietary Filters -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Dietary</label>
+            <div class="space-y-2">
+              <label class="flex items-center space-x-2 cursor-pointer">
+                <input v-model="filters.isGlutenFree" type="checkbox" class="w-4 h-4 text-blue-600 rounded border-gray-300 dark:border-gray-600 focus:ring-blue-500" />
+                <span class="flex items-center space-x-1 text-sm text-gray-700 dark:text-gray-300"><Icon name="lucide:wheat-off" class="w-4 h-4 text-green-600" /><span>Gluten Free</span></span>
+              </label>
+              <label class="flex items-center space-x-2 cursor-pointer">
+                <input v-model="filters.isLactoseFree" type="checkbox" class="w-4 h-4 text-blue-600 rounded border-gray-300 dark:border-gray-600 focus:ring-blue-500" />
+                <span class="flex items-center space-x-1 text-sm text-gray-700 dark:text-gray-300"><Icon name="lucide:milk-off" class="w-4 h-4 text-blue-600" /><span>Lactose Free</span></span>
+              </label>
+            </div>
           </div>
         </div>
         
@@ -146,18 +161,18 @@
       <!-- Results Header -->
       <div class="flex justify-between items-center mb-6">
         <div>
-          <h2 class="text-xl font-semibold text-gray-900">
+          <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100">
             {{ loading ? 'Searching...' : `${totalResults} recipes found` }}
           </h2>
-          <p v-if="searchQuery" class="text-gray-600">
+          <p v-if="searchQuery" class="text-gray-600 dark:text-gray-400">
             Results for "{{ searchQuery }}"
           </p>
         </div>
         
         <!-- Quick Sort -->
         <div class="flex items-center space-x-2">
-          <span class="text-sm text-gray-600">Sort:</span>
-          <select v-model="quickSort" @change="() => performSearch()" class="text-sm border border-gray-300 rounded px-2 py-1">
+          <span class="text-sm text-gray-600 dark:text-gray-400">Sort:</span>
+          <select v-model="quickSort" @change="() => performSearch()" class="text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded px-2 py-1">
             <option value="relevance">Relevance</option>
             <option value="rating">Rating</option>
             <option value="favoriteCount">Popular</option>
@@ -193,7 +208,7 @@
       
       <!-- No Results -->
       <div v-else class="text-center py-12">
-        <div class="text-gray-500 mb-4">No recipes found matching your criteria</div>
+        <div class="text-gray-500 dark:text-gray-400 mb-4">No recipes found matching your criteria</div>
         <button @click="clearFilters" class="btn-primary">
           Clear Filters
         </button>
@@ -213,7 +228,7 @@
     
     <!-- Initial State -->
     <div v-else class="text-center py-12">
-      <div class="text-gray-500 mb-4">Enter a search term or use filters to find recipes</div>
+      <div class="text-gray-500 dark:text-gray-400 mb-4">Enter a search term or use filters to find recipes</div>
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl mx-auto">
         <button
           v-for="suggestion in searchSuggestions"
@@ -221,7 +236,7 @@
           @click="() => { searchQuery = suggestion; performSearch() }"
           class="card text-center hover:shadow-md transition-all duration-200 hover:scale-105"
         >
-          <div class="text-sm font-medium text-gray-700">{{ suggestion }}</div>
+          <div class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ suggestion }}</div>
         </button>
       </div>
     </div>
@@ -270,6 +285,16 @@ const searchSuggestions = [
   'Low carb',
   'High protein'
 ]
+
+const toggleAdvanced = () => {
+  showAdvanced.value = !showAdvanced.value
+  if (showAdvanced.value) {
+    recipes.value = []
+    searchPerformed.value = false
+    totalResults.value = 0
+    currentPage.value = 1
+  }
+}
 
 const performSearch = async (loadMore = false) => {
   if (!loadMore) {
@@ -336,6 +361,8 @@ const clearFilters = () => {
     maxProtein: undefined,
     minCarbs: undefined,
     maxCarbs: undefined,
+    isGlutenFree: false,
+    isLactoseFree: false,
     sortBy: 'favoriteCount',
     sortOrder: 'desc'
   })

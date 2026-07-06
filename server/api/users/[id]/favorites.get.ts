@@ -1,135 +1,103 @@
 import { ObjectId } from 'mongodb'
 import { connectToDatabase, getCollection } from '../../../utils/db'
-import type { Recipe, Error, User } from '../../../../types'
 
 export default defineEventHandler(async (event) => {
   try {
     const userId = getRouterParam(event, 'id')
-    
+
     if (!userId) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: 'User ID is required'
-      })
+      throw createError({ statusCode: 400, statusMessage: 'User ID is required' })
     }
-    
+
     await connectToDatabase()
-    const recipes = getCollection('recipes')
     const users = getCollection('users')
-    
-    // First verify the user exists and get their favorite recipe IDs
-    const user = await users.findOne({ _id: ObjectId.createFromHexString(userId) }) as User | null
+    const favorites = getCollection('favorites')
+    const recipes = getCollection('recipes')
+
+    // Verify user exists
+    const user = await users.findOne({ _id: new ObjectId(userId) })
     if (!user) {
-      throw createError({
-        statusCode: 404,
-        statusMessage: 'User not found'
-      })
+      throw createError({ statusCode: 404, statusMessage: 'User not found' })
     }
-    
-    // Get the user's favorite recipe IDs
-    const favoriteRecipeIds = user.favRecipes || []
-    
-    if (favoriteRecipeIds.length === 0) {
-      return {
-        success: true,
-        data: []
-      }
+
+    // Get favorite recipe IDs from relational table
+    const favDocs = await favorites.find({ userId }).toArray()
+    if (favDocs.length === 0) {
+      return { success: true, data: [] }
     }
-    
-    // Convert string IDs to ObjectIds for MongoDB query
-    const objectIds = favoriteRecipeIds.map(id => {
-      try {
-        return ObjectId.createFromHexString(id)
-      } catch (error) {
-        console.warn(`Invalid ObjectId: ${id}`)
-        return null
-      }
-    }).filter(id => id !== null)
-    
-    if (objectIds.length === 0) {
-      return {
-        success: true,
-        data: []
-      }
+
+    const recipeIds = favDocs.map(f => {
+      try { return new ObjectId(f.recipeId) } catch { return null }
+    }).filter(Boolean)
+
+    if (recipeIds.length === 0) {
+      return { success: true, data: [] }
     }
-    
-    // Find all favorite recipes with creator information
+
+    // Fetch recipes with computed counts from relational tables
     const favoriteRecipes = await recipes
       .aggregate([
-        {
-          $match: { 
-            _id: { $in: objectIds }
-          }
-        },
+        { $match: { _id: { $in: recipeIds } } },
         {
           $addFields: {
-            createdByObjectId: { $toObjectId: '$createdByID' }
+            createdByIDObj: { $toObjectId: '$createdByID' },
+            recipeIdStr: { $toString: '$_id' }
           }
         },
         {
           $lookup: {
             from: 'users',
-            localField: 'createdByObjectId',
+            localField: 'createdByIDObj',
             foreignField: '_id',
-            as: 'creator',
-            pipeline: [
-              {
-                $project: {
-                  _id: 1,
-                  name: 1,
-                  avatar: 1
-                }
-              }
-            ]
+            as: 'creator'
+          }
+        },
+        {
+          $lookup: {
+            from: 'favorites',
+            localField: 'recipeIdStr',
+            foreignField: 'recipeId',
+            as: 'favoriteDocs'
+          }
+        },
+        {
+          $lookup: {
+            from: 'ratings',
+            localField: 'recipeIdStr',
+            foreignField: 'recipeId',
+            as: 'ratingDocs'
           }
         },
         {
           $addFields: {
             id: { $toString: '$_id' },
-            createdBy: { $arrayElemAt: ['$creator.name', 0] }
+            createdBy: { $arrayElemAt: ['$creator.name', 0] },
+            favoriteCount: { $size: '$favoriteDocs' },
+            averageRating: {
+              $cond: {
+                if: { $gt: [{ $size: '$ratingDocs' }, 0] },
+                then: { $round: [{ $divide: [{ $sum: '$ratingDocs.rating' }, { $size: '$ratingDocs' }] }, 1] },
+                else: null
+              }
+            },
+            totalRatings: { $size: '$ratingDocs' }
           }
         },
         {
           $project: {
-            _id: 0,
-            id: 1,
-            title: 1,
-            description: 1,
-            calories: 1,
-            protein: 1,
-            carbs: 1,
-            instructions: 1,
-            rating: 1,
-            difficultyRating: 1,
-            favoriteCount: 1,
-            ingredients: 1,
-            createdBy: 1,
-            createdByID: 1,
-            isGlutenFree: 1,
-            isLactoseFree: 1,
-            createdAt: 1,
-            updatedAt: 1
+            _id: 0, id: 1, title: 1, description: 1, calories: 1, protein: 1, carbs: 1,
+            averageRating: 1, totalRatings: 1, difficultyRating: 1, favoriteCount: 1,
+            createdBy: 1, createdByID: 1, isGlutenFree: 1, isLactoseFree: 1, createdAt: 1
           }
         },
-        {
-          $sort: { favoriteCount: -1, rating: -1 } // Most popular first
-        }
+        { $sort: { favoriteCount: -1, averageRating: -1 } }
       ])
       .toArray()
-    
-    return {
-      success: true,
-      data: favoriteRecipes
-    }
-  } catch (error: unknown) {
-    if ((error as Error).statusCode) {
-      throw error
-    }
-    
-    console.error('Error fetching user favorite recipes:', error)
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Internal server error'
-    })
+
+    return { success: true, data: favoriteRecipes }
+  } catch (error: any) {
+    if (error.statusCode) throw error
+    console.error('Error fetching user favorites:', error)
+    throw createError({ statusCode: 500, statusMessage: 'Internal server error' })
   }
 })

@@ -55,8 +55,8 @@
                 :class="[
                   'px-6 py-2 rounded-lg font-medium transition-colors',
                   isFollowing
-                    ? 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                    : 'bg-blue-600 text-white hover:bg-blue-700'
+                    ? 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                    : 'bg-violet-600 text-white hover:bg-violet-700'
                 ]"
               >
                 <span v-if="followLoading">...</span>
@@ -112,75 +112,124 @@
             <div class="grid grid-cols-3 gap-4 sm:gap-8">
               <NuxtLink
                 :to="`/users/${userProfile.id}/recipes`"
-                class="text-center hover:bg-gray-50 p-2 rounded-lg transition-colors"
+                class="text-center hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded-lg transition-colors"
               >
-                <div class="text-2xl font-bold text-gray-900">{{ stats.recipesCount }}</div>
-                <div class="text-sm text-gray-600">Recipes</div>
+                <div class="text-2xl font-bold text-gray-900 dark:text-gray-100">{{ stats.recipesCount }}</div>
+                <div class="text-sm text-gray-600 dark:text-gray-400">Recipes</div>
               </NuxtLink>
-              
+
               <NuxtLink
                 :to="`/users/${userProfile.id}/followers`"
-                class="text-center hover:bg-gray-50 p-2 rounded-lg transition-colors"
+                class="text-center hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded-lg transition-colors"
               >
-                <div class="text-2xl font-bold text-gray-900">{{ stats.followersCount }}</div>
-                <div class="text-sm text-gray-600">Followers</div>
+                <div class="text-2xl font-bold text-gray-900 dark:text-gray-100">{{ stats.followersCount }}</div>
+                <div class="text-sm text-gray-600 dark:text-gray-400">Followers</div>
               </NuxtLink>
-              
+
               <NuxtLink
                 :to="`/users/${userProfile.id}/following`"
-                class="text-center hover:bg-gray-50 p-2 rounded-lg transition-colors"
+                class="text-center hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded-lg transition-colors"
               >
-                <div class="text-2xl font-bold text-gray-900">{{ stats.followingCount }}</div>
-                <div class="text-sm text-gray-600">Following</div>
+                <div class="text-2xl font-bold text-gray-900 dark:text-gray-100">{{ stats.followingCount }}</div>
+                <div class="text-sm text-gray-600 dark:text-gray-400">Following</div>
               </NuxtLink>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- User's Recipes -->
+      <!-- Recipes / Favorites Tabs -->
       <div class="card">
-        <h2 class="text-xl font-semibold text-gray-900 mb-6">Recipes by {{ userProfile.name }}</h2>
-        
-        <!-- Loading Recipes -->
-        <div v-if="recipesLoading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div v-for="i in 6" :key="i" class="recipe-card animate-pulse">
-            <div class="h-48 bg-gray-200 rounded-t-xl"></div>
-            <div class="p-6">
-              <div class="h-4 bg-gray-200 rounded mb-2"></div>
-              <div class="h-3 bg-gray-200 rounded mb-4 w-3/4"></div>
+        <!-- Tab Navigation -->
+        <div class="border-b border-gray-200 dark:border-gray-700 mb-6">
+          <nav class="-mb-px flex space-x-8">
+            <button
+              @click="profileTab = 'recipes'"
+              :class="[
+                'py-2 px-1 border-b-2 font-medium text-sm',
+                profileTab === 'recipes'
+                  ? 'border-violet-500 text-violet-600 dark:text-violet-400'
+                  : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:border-gray-300 dark:hover:border-gray-500'
+              ]"
+            >
+              Recipes ({{ stats.recipesCount }})
+            </button>
+            <button
+              @click="switchToFavorites"
+              :class="[
+                'py-2 px-1 border-b-2 font-medium text-sm',
+                profileTab === 'favorites'
+                  ? 'border-violet-500 text-violet-600 dark:text-violet-400'
+                  : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:border-gray-300 dark:hover:border-gray-500'
+              ]"
+            >
+              Favorites
+            </button>
+          </nav>
+        </div>
+
+        <!-- Recipes Tab -->
+        <div v-if="profileTab === 'recipes'">
+          <div v-if="recipesLoading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div v-for="i in 6" :key="i" class="recipe-card animate-pulse">
+              <div class="h-48 bg-gray-200 dark:bg-gray-700 rounded-t-xl"></div>
+              <div class="p-6">
+                <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
+                <div class="h-3 bg-gray-200 dark:bg-gray-700 rounded mb-4 w-3/4"></div>
+              </div>
             </div>
           </div>
+          <div v-else-if="userRecipes.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <RecipeCard
+              v-for="recipe in userRecipes"
+              :key="recipe.id"
+              :recipe="recipe"
+              class="animate-fade-in"
+            />
+          </div>
+          <div v-else class="text-center py-12">
+            <div class="text-gray-500 dark:text-gray-400">{{ userProfile.name }} hasn't created any recipes yet</div>
+          </div>
         </div>
-        
-        <!-- Recipes Grid -->
-        <div v-else-if="userRecipes.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <RecipeCard
-            v-for="recipe in userRecipes"
-            :key="recipe.id"
-            :recipe="recipe"
-            class="animate-fade-in"
-          />
-        </div>
-        
-        <!-- No Recipes -->
-        <div v-else class="text-center py-12">
-          <div class="text-gray-500">{{ userProfile.name }} hasn't created any recipes yet</div>
+
+        <!-- Favorites Tab -->
+        <div v-else-if="profileTab === 'favorites'">
+          <div v-if="favoritesLoading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div v-for="i in 6" :key="i" class="recipe-card animate-pulse">
+              <div class="h-48 bg-gray-200 dark:bg-gray-700 rounded-t-xl"></div>
+              <div class="p-6">
+                <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
+                <div class="h-3 bg-gray-200 dark:bg-gray-700 rounded mb-4 w-3/4"></div>
+              </div>
+            </div>
+          </div>
+          <div v-else-if="userFavorites.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <RecipeCard
+              v-for="recipe in userFavorites"
+              :key="recipe.id"
+              :recipe="recipe"
+              :initialFavorited="true"
+              class="animate-fade-in"
+            />
+          </div>
+          <div v-else class="text-center py-12">
+            <div class="text-gray-500 dark:text-gray-400">{{ userProfile.name }} hasn't favorited any recipes yet</div>
+          </div>
         </div>
       </div>
     </div>
     
     <!-- Error State -->
     <div v-else class="text-center py-12">
-      <h1 class="text-2xl font-bold text-gray-900 mb-4">User Not Found</h1>
-      <p class="text-gray-600 mb-6">The user you're looking for doesn't exist.</p>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">User Not Found</h1>
+      <p class="text-gray-600 dark:text-gray-400 mb-6">The user you're looking for doesn't exist.</p>
       <NuxtLink to="/" class="btn-primary">Go Home</NuxtLink>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import type { Recipe, User } from '../../../types'
+import type { RecipeResponse, UserProfile } from '../../../types'
 
 const route = useRoute()
 const { user: currentUser } = useSimpleAuth()
@@ -189,12 +238,15 @@ const userId = route.params.id as string
 
 const loading = ref(true)
 const recipesLoading = ref(true)
+const favoritesLoading = ref(false)
 const followLoading = ref(false)
 const editMode = ref(false)
 const updating = ref(false)
-const userProfile = ref<User | null>(null)
-const userRecipes = ref<Recipe[]>([])
+const userProfile = ref<UserProfile | null>(null)
+const userRecipes = ref<RecipeResponse[]>([])
+const userFavorites = ref<RecipeResponse[]>([])
 const isFollowing = ref(false)
+const profileTab = ref<'recipes' | 'favorites'>('recipes')
 
 const stats = ref({
   recipesCount: 0,
@@ -214,7 +266,20 @@ const isOwnProfile = computed(() => {
 const fetchUserProfile = async () => {
   try {
     loading.value = true
-    const { data } = await $fetch(`/api/users/${userId}`) as { success: boolean, data: User }
+    const { data } = await $fetch(`/api/users/${userId}`) as {
+      success: boolean
+      data: {
+        id: string
+        name: string
+        email: string
+        bio?: string
+        avatar?: string
+        followersCount: number
+        followingCount: number
+        recipesCount: number
+        isFollowing: boolean
+      }
+    }
     userProfile.value = data
 
     // Update edit form if own profile
@@ -223,16 +288,16 @@ const fetchUserProfile = async () => {
       editForm.bio = data.bio || ''
     }
 
-    // Update stats
+    // Update stats from computed counts returned by API
     stats.value = {
-      recipesCount: data.createdRecipes?.length || 0,
-      followersCount: data.followers?.length || 0,
-      followingCount: data.following?.length || 0
+      recipesCount: data.recipesCount ?? 0,
+      followersCount: data.followersCount ?? 0,
+      followingCount: data.followingCount ?? 0
     }
 
-    // Check if current user is following this user
-    if (currentUser.value && !isOwnProfile.value) {
-      isFollowing.value = data.followers?.includes(currentUser.value.id) || false
+    // isFollowing returned directly from the API
+    if (!isOwnProfile.value) {
+      isFollowing.value = data.isFollowing ?? false
     }
 
   } catch (error: any) {
@@ -249,7 +314,7 @@ const fetchUserProfile = async () => {
 const fetchUserRecipes = async () => {
   try {
     recipesLoading.value = true
-    const { data } = await $fetch(`/api/users/${userId}/recipes`) as { success: boolean, data: Recipe[] }
+    const { data } = await $fetch(`/api/users/${userId}/recipes`) as { success: boolean, data: RecipeResponse[] }
     userRecipes.value = data || []
   } catch (error) {
     console.error('Error fetching user recipes:', error)
@@ -288,7 +353,7 @@ const updateProfile = async () => {
     const { data } = await $fetch(`/api/users/${userId}`, {
       method: 'PATCH',
       body: editForm
-    }) as { success: boolean, data: User }
+    }) as { success: boolean, data: UserProfile }
 
     userProfile.value = { ...userProfile.value, ...data }
     editMode.value = false
@@ -297,6 +362,25 @@ const updateProfile = async () => {
     console.error('Error updating profile:', error)
   } finally {
     updating.value = false
+  }
+}
+
+const fetchUserFavorites = async () => {
+  try {
+    favoritesLoading.value = true
+    const { data } = await $fetch(`/api/users/${userId}/favorites`) as { success: boolean, data: RecipeResponse[] }
+    userFavorites.value = data || []
+  } catch (error) {
+    console.error('Error fetching user favorites:', error)
+  } finally {
+    favoritesLoading.value = false
+  }
+}
+
+const switchToFavorites = () => {
+  profileTab.value = 'favorites'
+  if (userFavorites.value.length === 0 && !favoritesLoading.value) {
+    fetchUserFavorites()
   }
 }
 

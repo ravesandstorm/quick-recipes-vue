@@ -1,24 +1,29 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
+  <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-md w-full space-y-8">
       <div class="text-center">
-        <h2 class="mt-6 text-3xl font-extrabold text-gray-900 animate-fade-in">
+        <h2 class="mt-6 text-3xl font-extrabold text-gray-900 dark:text-gray-100 animate-fade-in">
           Sign in to Quick Recipes
         </h2>
-        <p class="mt-2 text-sm text-gray-600">
+        <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
           Or
-          <NuxtLink to="/auth/signup" class="font-medium text-blue-600 hover:text-blue-500 transition-colors">
+          <NuxtLink to="/auth/signup" class="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 transition-colors">
             create a new account
           </NuxtLink>
         </p>
       </div>
       
+      <!-- Redirect message -->
+      <div v-if="route.query.redirect" class="rounded-lg bg-blue-50 dark:bg-blue-900/30 px-4 py-3 text-sm text-blue-700 dark:text-blue-300 text-center">
+        Please sign in to continue
+      </div>
+
       <div class="card animate-slide-up">
         <!-- Google OAuth Button -->
         <button
           @click="signInWithGoogle"
           :disabled="loading"
-          class="w-full flex justify-center items-center px-4 py-3 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          class="w-full flex justify-center items-center px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm bg-white dark:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <!-- Google Icon placeholder - replace with actual Google icon -->
           <svg class="w-5 h-5 mr-3" viewBox="0 0 24 24">
@@ -33,10 +38,10 @@
         <div class="mt-6">
           <div class="relative">
             <div class="absolute inset-0 flex items-center">
-              <div class="w-full border-t border-gray-300" />
+              <div class="w-full border-t border-gray-300 dark:border-gray-600" />
             </div>
             <div class="relative flex justify-center text-sm">
-              <span class="px-2 bg-white text-gray-500">Or continue with email</span>
+              <span class="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">Or continue with email</span>
             </div>
           </div>
         </div>
@@ -44,7 +49,7 @@
         <!-- Email/Password Form -->
         <form @submit.prevent="signInWithCredentials" class="mt-6 space-y-6">
           <div>
-            <label for="email" class="block text-sm font-medium text-gray-700">Email address</label>
+            <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email address</label>
             <input
               id="email"
               v-model="form.email"
@@ -56,7 +61,7 @@
           </div>
           
           <div>
-            <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+            <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Password</label>
             <input
               id="password"
               v-model="form.password"
@@ -67,7 +72,7 @@
             />
           </div>
           
-          <div v-if="error" class="text-red-600 text-sm bg-red-50 p-3 rounded-lg">
+          <div v-if="error" class="text-red-600 dark:text-red-400 text-sm bg-red-50 dark:bg-red-900/20 p-3 rounded-lg">
             {{ error }}
           </div>
           
@@ -94,6 +99,7 @@
 <script setup lang="ts">
 import type { Error } from '../../../types'
 
+const route = useRoute()
 const runtimeConfig = useRuntimeConfig()
 const googleClientId = runtimeConfig.public.googleClientId
 
@@ -212,9 +218,12 @@ const signInWithCredentials = async () => {
       }
     })
 
-    // Authentication is now handled via HTTP-only cookies
-    // Redirect to dashboard
-    await navigateTo('/')
+    // Cookie is set by server — update shared auth state then redirect
+    const { checkAuth } = useSimpleAuth()
+    await checkAuth()
+
+    const redirectTo = (route.query.redirect as string) || '/'
+    await navigateTo(redirectTo)
 
   } catch (err: unknown) {
     error.value = (err as Error)?.statusMessage || 'Failed to sign in'

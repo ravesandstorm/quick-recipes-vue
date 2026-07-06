@@ -18,18 +18,18 @@
       </button>
 
       <!-- Difficulty Badge -->
-      <div v-if="recipe.difficultyRating" class="absolute top-3 left-3 px-2 py-1 bg-white/80 backdrop-blur-sm rounded-full text-xs font-medium">
+      <div v-if="recipe.difficultyRating" class="absolute top-3 left-3 px-2 py-1 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-full text-xs font-medium text-gray-800 dark:text-gray-200">
         {{ getDifficultyText(recipe.difficultyRating) }}
       </div>
 
       <!-- Dietary Restriction Badges -->
       <div class="absolute bottom-3 left-3 flex space-x-1">
         <span v-if="recipe.isGlutenFree" class="px-2 py-1 bg-green-600 text-white text-xs font-medium rounded-full flex items-center space-x-1">
-          <span>🌾</span>
+          <Icon name="lucide:wheat-off" class="w-3 h-3" />
           <span>GF</span>
         </span>
         <span v-if="recipe.isLactoseFree" class="px-2 py-1 bg-blue-600 text-white text-xs font-medium rounded-full flex items-center space-x-1">
-          <span>🥛</span>
+          <Icon name="lucide:milk-off" class="w-3 h-3" />
           <span>LF</span>
         </span>
       </div>
@@ -39,34 +39,34 @@
     <div class="p-6">
       <!-- Title with Rating -->
       <div class="flex items-start justify-between mb-2">
-        <h3 class="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2 flex-1 pr-2">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2 flex-1 pr-2">
           {{ recipe.title }}
         </h3>
         <div class="flex items-center space-x-1 text-sm text-gray-500 flex-shrink-0">
           <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 24 24">
             <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
           </svg>
-          <span class="font-medium">{{ recipe.rating || 'N/A' }}</span>
+          <span class="font-medium">{{ recipe.averageRating ?? 'N/A' }}</span>
         </div>
       </div>
 
-      <p class="text-gray-600 text-sm mb-4 line-clamp-2">
+      <p class="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-2">
         {{ recipe.description }}
       </p>
 
       <!-- Recipe Stats -->
-      <div class="flex items-center justify-between text-sm text-gray-500 mb-4">
+      <div class="flex flex-wrap items-center justify-between gap-y-1 text-sm text-gray-500 dark:text-gray-400 mb-4">
         <div class="flex items-center space-x-3">
           <div class="flex items-center space-x-1">
-            <span>🔥</span>
+            <Icon name="lucide:flame" class="w-4 h-4 text-orange-500" />
             <span>{{ recipe.calories }} cal</span>
           </div>
           <div class="flex items-center space-x-1">
-            <span>💪</span>
+            <Icon name="lucide:dumbbell" class="w-4 h-4 text-blue-500" />
             <span>{{ recipe.protein }}g</span>
           </div>
           <div class="flex items-center space-x-1">
-            <span>🌾</span>
+            <Icon name="lucide:wheat" class="w-4 h-4 text-yellow-600" />
             <span>{{ recipe.carbs }}g</span>
           </div>
         </div>
@@ -75,7 +75,7 @@
           <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
             <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
           </svg>
-          <span class="font-medium">{{ recipe.favoriteCount || 0 }}</span>
+          <span class="font-medium">{{ favoriteCount || 0 }}</span>
         </div>
       </div>
       
@@ -85,44 +85,40 @@
           v-if="recipe.createdByID"
           :to="`/users/${recipe.createdByID}`"
           @click.stop
-          class="flex items-center space-x-2 hover:bg-gray-50 rounded-lg p-1 -m-1 transition-colors"
+          class="flex items-center space-x-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg p-1 -m-1 transition-colors"
         >
           <div class="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
             <span class="text-white text-xs font-medium">
               {{ getCreatorInitial() }}
             </span>
           </div>
-          <span class="text-sm text-gray-600 hover:text-blue-600 transition-colors">{{ recipe.createdBy || 'Anonymous' }}</span>
+          <span class="text-sm text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">{{ recipe.createdBy || 'Anonymous' }}</span>
         </NuxtLink>
         <div v-else class="flex items-center space-x-2">
           <div class="w-6 h-6 bg-gray-400 rounded-full flex items-center justify-center">
             <span class="text-white text-xs font-medium">?</span>
           </div>
-          <span class="text-sm text-gray-600">Anonymous</span>
+          <span class="text-sm text-gray-600 dark:text-gray-300">Anonymous</span>
         </div>
 
-        <div class="flex items-center space-x-1 text-sm text-gray-500">
-          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-          </svg>
-          <span>{{ recipe.favoriteCount || 0 }}</span>
-        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import type { Recipe } from '../../types'
+import type { RecipeResponse } from '../../types'
 
 interface Props {
-  recipe: Recipe & { createdBy?: string }
+  recipe: RecipeResponse
+  initialFavorited?: boolean
 }
 
 const props = defineProps<Props>()
 
 const { user } = useSimpleAuth()
-const isFavorited = ref(false)
+const isFavorited = ref(props.initialFavorited ?? false)
+const favoriteCount = ref(props.recipe.favoriteCount)
 
 const goToRecipe = () => {
   navigateTo(`/recipes/${props.recipe.id}`)
@@ -139,11 +135,7 @@ const toggleFavorite = async () => {
       method: 'POST'
     }) as { success: boolean, data: { isFavorited: boolean, favoriteCount: number } }
 
-    // Update favorite count
-    if (props.recipe.favoriteCount !== undefined) {
-      props.recipe.favoriteCount = data.favoriteCount
-    }
-
+    favoriteCount.value = data.favoriteCount
     isFavorited.value = data.isFavorited
   } catch (error) {
     // Revert on error

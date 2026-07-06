@@ -1,5 +1,5 @@
 <template>
-  <div class="space-y-3">
+  <div ref="multiSelectRoot" class="space-y-3">
     <!-- Search Input -->
     <div class="relative">
       <input
@@ -81,6 +81,7 @@ interface Emits {
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
+const multiSelectRef = useTemplateRef('multiSelectRoot')
 const searchQuery = ref('')
 const showSuggestions = ref(false)
 const suggestions = ref<Ingredient[]>([])
@@ -144,7 +145,7 @@ onMounted(async () => {
 })
 
 // Close suggestions when clicking outside
-onClickOutside(templateRef, () => {
+onClickOutside(multiSelectRef, () => {
   showSuggestions.value = false
 })
 </script>

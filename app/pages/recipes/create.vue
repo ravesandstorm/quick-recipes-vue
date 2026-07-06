@@ -1,18 +1,18 @@
 <template>
   <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <div class="mb-8">
-      <h1 class="text-3xl font-bold text-gray-900 mb-2">Create New Recipe</h1>
-      <p class="text-gray-600">Share your culinary creation with the community</p>
+      <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">Create New Recipe</h1>
+      <p class="text-gray-600 dark:text-gray-400">Share your culinary creation with the community</p>
     </div>
     
     <form @submit.prevent="submitRecipe" class="space-y-8">
       <!-- Basic Information -->
       <div class="card">
-        <h2 class="text-xl font-semibold text-gray-900 mb-6">Basic Information</h2>
+        <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-6">Basic Information</h2>
         
         <div class="space-y-6">
           <div>
-            <label for="title" class="block text-sm font-medium text-gray-700 mb-2">Recipe Title</label>
+            <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Recipe Title</label>
             <input
               id="title"
               v-model="form.title"
@@ -24,7 +24,7 @@
           </div>
           
           <div>
-            <label for="description" class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+            <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Description</label>
             <textarea
               id="description"
               v-model="form.description"
@@ -36,7 +36,7 @@
           </div>
           
           <div>
-            <label for="difficulty" class="block text-sm font-medium text-gray-700 mb-2">Difficulty Rating</label>
+            <label for="difficulty" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Difficulty Rating</label>
             <select
               id="difficulty"
               v-model="form.difficultyRating"
@@ -55,13 +55,13 @@
       
       <!-- Ingredients -->
       <div class="card">
-        <h2 class="text-xl font-semibold text-gray-900 mb-6">Ingredients</h2>
-        
+        <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-6">Ingredients</h2>
+
         <div class="space-y-4">
           <div
             v-for="(ingredient, index) in form.ingredients"
             :key="index"
-            class="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg"
+            class="flex items-center space-x-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg"
           >
             <div class="flex-1">
               <IngredientSelector
@@ -83,7 +83,7 @@
           <button
             type="button"
             @click="addIngredient"
-            class="w-full py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-gray-400 hover:text-gray-700 transition-colors"
+            class="w-full py-3 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-400 hover:border-gray-400 dark:hover:border-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
           >
             + Add Ingredient
           </button>
@@ -92,7 +92,7 @@
       
       <!-- Instructions -->
       <div class="card">
-        <h2 class="text-xl font-semibold text-gray-900 mb-6">Instructions</h2>
+        <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-6">Instructions</h2>
         
         <div class="space-y-4">
           <div
@@ -100,7 +100,7 @@
             :key="index"
             class="flex items-start space-x-4"
           >
-            <div class="flex-shrink-0 w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-medium mt-1">
+            <div class="flex-shrink-0 w-8 h-8 bg-emerald-500 text-white rounded-full flex items-center justify-center text-sm font-medium mt-1">
               {{ index + 1 }}
             </div>
             <div class="flex-1">
@@ -126,7 +126,7 @@
           <button
             type="button"
             @click="addInstruction"
-            class="w-full py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-gray-400 hover:text-gray-700 transition-colors"
+            class="w-full py-3 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-400 hover:border-gray-400 dark:hover:border-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
           >
             + Add Step
           </button>
@@ -135,7 +135,7 @@
 
       <!-- Dietary Restrictions -->
       <div class="card">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">Dietary Information</h3>
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Dietary Information</h3>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <label class="flex items-center space-x-3 cursor-pointer">
             <input
@@ -144,8 +144,8 @@
               class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
             />
             <div class="flex items-center space-x-2">
-              <span class="text-sm font-medium text-gray-700">Gluten-Free</span>
-              <span class="text-lg">🌾</span>
+              <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Gluten-Free</span>
+              <Icon name="lucide:wheat-off" class="w-4 h-4 text-green-600" />
             </div>
           </label>
 
@@ -156,28 +156,28 @@
               class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
             />
             <div class="flex items-center space-x-2">
-              <span class="text-sm font-medium text-gray-700">Lactose-Free</span>
-              <span class="text-lg">🥛</span>
+              <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Lactose-Free</span>
+              <Icon name="lucide:milk-off" class="w-4 h-4 text-blue-600" />
             </div>
           </label>
         </div>
       </div>
 
       <!-- Calculated Nutrition -->
-      <div class="card bg-blue-50 border-blue-200">
-        <h2 class="text-xl font-semibold text-gray-900 mb-6">Estimated Nutrition</h2>
-        <div class="grid grid-cols-3 gap-6">
+      <div class="card bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
+        <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-6">Estimated Nutrition</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
           <div class="text-center">
-            <div class="text-2xl font-bold text-blue-600">{{ calculatedNutrition.calories }}</div>
-            <div class="text-sm text-gray-600">Calories</div>
+            <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">{{ calculatedNutrition.calories }}</div>
+            <div class="text-sm text-gray-600 dark:text-gray-400">Calories</div>
           </div>
           <div class="text-center">
-            <div class="text-2xl font-bold text-green-600">{{ calculatedNutrition.protein }}g</div>
-            <div class="text-sm text-gray-600">Protein</div>
+            <div class="text-2xl font-bold text-green-600 dark:text-green-400">{{ calculatedNutrition.protein }}g</div>
+            <div class="text-sm text-gray-600 dark:text-gray-400">Protein</div>
           </div>
           <div class="text-center">
-            <div class="text-2xl font-bold text-orange-600">{{ calculatedNutrition.carbs }}g</div>
-            <div class="text-sm text-gray-600">Carbs</div>
+            <div class="text-2xl font-bold text-orange-600 dark:text-orange-400">{{ calculatedNutrition.carbs }}g</div>
+            <div class="text-sm text-gray-600 dark:text-gray-400">Carbs</div>
           </div>
         </div>
       </div>
@@ -199,7 +199,7 @@
         </button>
         <button
           type="submit"
-          class="btn-primary"
+          class="bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           :disabled="submitting || !isFormValid"
         >
           <span v-if="submitting">Publishing...</span>

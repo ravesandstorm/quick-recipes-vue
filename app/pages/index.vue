@@ -114,16 +114,16 @@
 
     <!-- Popular Categories -->
     <div class="mb-12">
-      <h2 class="text-3xl font-bold text-gray-900 mb-6">Popular Categories</h2>
+      <h2 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-6">Popular Categories</h2>
       <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
         <button
           v-for="category in categories"
           :key="category.name"
           @click="searchByCategory(category.name)"
-          class="card text-center hover:shadow-md transition-all duration-200 hover:scale-105"
+          class="card text-center hover:shadow-md transition-all duration-200 hover:scale-105 cursor-pointer"
         >
-          <div class="text-2xl mb-2">{{ category.icon }}</div>
-          <div class="text-sm font-medium text-gray-700">{{ category.name }}</div>
+          <Icon :name="category.icon" class="w-7 h-7 mx-auto mb-2 text-gray-600 dark:text-gray-300" />
+          <div class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ category.name }}</div>
         </button>
       </div>
     </div>
@@ -159,7 +159,7 @@ interface Recipe {
   createdAt: Date
 }
 
-const { user } = useLocalData()
+const { user } = useSimpleAuth()
 
 const loading = ref(true)
 const recipes = ref<Recipe[]>([])
@@ -171,12 +171,12 @@ const stats = ref({
 })
 
 const categories = [
-  { name: 'Breakfast', icon: '🍳' },
-  { name: 'Lunch', icon: '🥗' },
-  { name: 'Dinner', icon: '🍽️' },
-  { name: 'Dessert', icon: '🍰' },
-  { name: 'Snacks', icon: '🍿' },
-  { name: 'Drinks', icon: '🥤' }
+  { name: 'Breakfast', icon: 'lucide:sunrise' },
+  { name: 'Lunch', icon: 'lucide:salad' },
+  { name: 'Dinner', icon: 'lucide:utensils' },
+  { name: 'Dessert', icon: 'lucide:cake' },
+  { name: 'Snacks', icon: 'lucide:cookie' },
+  { name: 'Drinks', icon: 'lucide:cup-soda' }
 ]
 
 const searchByCategory = (category: string) => {
@@ -212,11 +212,10 @@ const fetchData = async () => {
       }
     } catch (statsError) {
       console.error('Error fetching stats:', statsError)
-      // Use default stats if API fails
       stats.value = {
-        totalRecipes: 1247,
-        totalUsers: 3892,
-        totalIngredients: 456
+        totalRecipes: 0,
+        totalUsers: 0,
+        totalIngredients: 0
       }
     }
 

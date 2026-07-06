@@ -31,17 +31,10 @@ export default defineEventHandler(async (event) => {
       userId: userId
     })
 
-    if (!userRating) {
-      throw createError({
-        statusCode: 404,
-        statusMessage: 'Rating not found'
-      })
-    }
-
     return {
       success: true,
       data: {
-        rating: userRating.rating
+        rating: userRating?.rating ?? null
       }
     }
   } catch (error: unknown) {

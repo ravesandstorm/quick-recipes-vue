@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs'
 import { connectToDatabase, getCollection } from '../../utils/db'
 import { createToken, setAuthCookie } from '../../utils/auth'
-import type { User, SignupCredentials, Error } from '../../../types'
+import type { User, SignupCredentials, AppError } from '../../../types'
 
 export default defineEventHandler(async (event) => {
   try {
@@ -69,7 +69,7 @@ export default defineEventHandler(async (event) => {
       }
     }
   } catch (error: unknown) {
-    if ((error as Error).statusCode) {
+    if ((error as AppError).statusCode) {
       throw error
     }
 

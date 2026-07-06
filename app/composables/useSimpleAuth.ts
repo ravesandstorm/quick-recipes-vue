@@ -1,40 +1,39 @@
 import type { AuthUser } from '../../types'
 
 export const useSimpleAuth = () => {
-  const user = ref<AuthUser | null>(null)
-  const status = ref('loading')
+  // useState ensures shared state across all component instances (SSR-safe)
+  // The auth.server.ts plugin pre-populates these on the server
+  const user = useState<AuthUser | null>('auth-user', () => null)
+  const status = useState<string>('auth-status', () => 'loading')
 
-  // Check authentication status from server
   const checkAuth = async () => {
     try {
       status.value = 'loading'
       const response = await $fetch('/api/auth/me') as { success: boolean, data: AuthUser }
       user.value = response.data
       status.value = 'authenticated'
-    } catch (error) {
+    } catch {
       user.value = null
       status.value = 'unauthenticated'
     }
   }
 
-  // Sign out function
   const signOut = async () => {
     try {
       await $fetch('/api/auth/logout', { method: 'POST' })
-      user.value = null
-      status.value = 'unauthenticated'
-    } catch (error) {
-      console.error('Logout error:', error)
-      // Still clear local state even if server request fails
+    } catch {
+      // ignore errors, still clear local state
+    } finally {
       user.value = null
       status.value = 'unauthenticated'
     }
   }
 
-  // Initialize on mount
-  onMounted(() => {
-    checkAuth()
-  })
+  // Only call checkAuth on the client if the server plugin didn't resolve the state
+  // (e.g., during client-only navigation or if SSR was bypassed)
+  if (getCurrentInstance() && import.meta.client && status.value === 'loading') {
+    onMounted(checkAuth)
+  }
 
   return {
     user: readonly(user),

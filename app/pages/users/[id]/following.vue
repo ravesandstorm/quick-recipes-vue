@@ -3,22 +3,22 @@
     <!-- Header -->
     <div class="mb-8">
       <div class="flex items-center space-x-4 mb-4">
-        <button @click="$router.back()" class="p-2 hover:bg-gray-100 rounded-lg">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <button @click="$router.back()" class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
+          <svg class="w-5 h-5 text-gray-700 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
           </svg>
         </button>
-        <h1 class="text-2xl font-bold text-gray-900">
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">
           {{ userProfile?.name }}'s Following
         </h1>
       </div>
       
       <!-- Navigation Tabs -->
-      <div class="border-b border-gray-200">
+      <div class="border-b border-gray-200 dark:border-gray-700">
         <nav class="-mb-px flex space-x-8">
           <NuxtLink
             :to="`/users/${userId}/followers`"
-            class="py-2 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium text-sm"
+            class="py-2 px-1 border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:border-gray-300 dark:hover:border-gray-500 font-medium text-sm"
           >
             Followers
           </NuxtLink>
@@ -34,7 +34,7 @@
 
     <!-- Loading State -->
     <div v-if="loading" class="space-y-4">
-      <div v-for="i in 5" :key="i" class="flex items-center space-x-4 p-4 bg-white rounded-lg shadow-sm animate-pulse">
+      <div v-for="i in 5" :key="i" class="flex items-center space-x-4 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm animate-pulse">
         <div class="w-12 h-12 bg-gray-200 rounded-full"></div>
         <div class="flex-1">
           <div class="h-4 bg-gray-200 rounded mb-2"></div>
@@ -49,7 +49,7 @@
       <div
         v-for="followedUser in following"
         :key="followedUser.id"
-        class="flex items-center justify-between p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow"
+        class="flex items-center justify-between p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-shadow"
       >
         <NuxtLink :to="`/users/${followedUser.id}`" class="flex items-center space-x-4 flex-1">
           <!-- Avatar -->
@@ -61,9 +61,9 @@
           
           <!-- User Info -->
           <div class="flex-1">
-            <h3 class="font-medium text-gray-900">{{ followedUser.name }}</h3>
-            <p v-if="followedUser.bio" class="text-sm text-gray-600 truncate">{{ followedUser.bio }}</p>
-            <div class="text-xs text-gray-500">
+            <h3 class="font-medium text-gray-900 dark:text-gray-100">{{ followedUser.name }}</h3>
+            <p v-if="followedUser.bio" class="text-sm text-gray-600 dark:text-gray-400 truncate">{{ followedUser.bio }}</p>
+            <div class="text-xs text-gray-500 dark:text-gray-400">
               {{ followedUser.recipesCount || 0 }} recipes
             </div>
           </div>
@@ -100,7 +100,7 @@
 
     <!-- Empty State -->
     <div v-else class="text-center py-12">
-      <div class="text-gray-500 mb-4">
+      <div class="text-gray-500 dark:text-gray-400 mb-4">
         {{ isOwnProfile ? 'You aren\'t following anyone yet' : `${userProfile?.name} isn't following anyone yet` }}
       </div>
       <NuxtLink to="/search" class="btn-primary">
@@ -148,8 +148,8 @@ const fetchFollowing = async () => {
         let isFollowing = isOwnProfile.value
         if (!isOwnProfile.value && currentUser.value && followedUser.id !== currentUser.value.id) {
           try {
-            const currentUserData = await $fetch(`/api/users/${currentUser.value.id}`) as { success: boolean, data: User }
-            isFollowing = currentUserData.data.following?.includes(followedUser.id) || false
+            const followData = await $fetch(`/api/users/${followedUser.id}`) as { data: { isFollowing: boolean } }
+            isFollowing = followData.data.isFollowing ?? false
           } catch (error) {
             console.error('Error checking follow status:', error)
           }
@@ -159,7 +159,7 @@ const fetchFollowing = async () => {
           ...followedUser,
           isFollowing,
           followLoading: false,
-          recipesCount: followedUser.createdRecipes?.length || 0
+          recipesCount: followedUser.recipesCount ?? 0
         }
       })
     )

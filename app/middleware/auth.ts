@@ -1,17 +1,16 @@
-export default defineNuxtRouteMiddleware(async (to, from) => {
-  // Only protect specific routes that require user authentication
+export default defineNuxtRouteMiddleware((to) => {
   const protectedRoutes = ['/recipes/create', '/profile', '/my-recipes']
-  const isProtectedRoute = protectedRoutes.some(route => to.path.startsWith(route))
+  if (!protectedRoutes.some(route => to.path.startsWith(route))) return
 
-  if (isProtectedRoute) {
-    // Check authentication status from server
-    try {
-      const { data } = await $fetch('/api/auth/me')
-      if (!data) {
-        return navigateTo('/auth/login')
-      }
-    } catch (error) {
-      return navigateTo('/auth/login')
-    }
+  // Prevent redirect loops
+  if (to.path === '/auth/login') return
+
+  const { status, user } = useSimpleAuth()
+
+  // If the plugin has resolved auth and user is not authenticated, redirect
+  if (status.value === 'unauthenticated' || (status.value !== 'loading' && !user.value)) {
+    return navigateTo(`/auth/login?redirect=${encodeURIComponent(to.fullPath)}`)
   }
+  // If status is 'loading', the server plugin is still resolving — let it through
+  // and the page itself will handle any protected UI
 })

@@ -1,4 +1,3 @@
-import { ObjectId } from 'mongodb'
 import { connectToDatabase, getCollection } from '../../utils/db'
 import type { Recipe, RecipeFormData } from '../../../types'
 
@@ -31,10 +30,8 @@ export default defineEventHandler(async (event) => {
     
     await connectToDatabase()
     const recipes = getCollection('recipes')
-    const users = getCollection('users')
-    
-    // Create new recipe
-    const newRecipe: Omit<Recipe, '_id' | 'id'> = {
+
+    const newRecipe: Omit<Recipe, '_id'> = {
       title: body.title,
       description: body.description,
       calories: body.calories,
@@ -42,8 +39,6 @@ export default defineEventHandler(async (event) => {
       carbs: body.carbs,
       instructions: body.instructions.filter(inst => inst.trim()),
       createdByID: userId,
-      favoriteCount: 0,
-      rating: undefined,
       difficultyRating: body.difficultyRating,
       ingredientIDs: body.ingredients.map(ing => ing.ingredientId),
       ingredients: body.ingredients,
@@ -56,19 +51,7 @@ export default defineEventHandler(async (event) => {
     const result = await recipes.insertOne(newRecipe)
     const recipeId = result.insertedId.toString()
 
-    // Update user's created recipes
-    try {
-      await users.updateOne(
-        { _id: new ObjectId(userId) },
-        {
-          $push: { createdRecipes: recipeId },
-          $set: { updatedAt: new Date() }
-        }
-      )
-    } catch (userUpdateError) {
-      console.warn('Failed to update user created recipes:', userUpdateError)
-      // Don't fail the recipe creation if user update fails
-    }
+    // Recipe stores createdByID as FK — no separate user array to update
     
     return {
       success: true,

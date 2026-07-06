@@ -1,5 +1,6 @@
 import { connectToDatabase, getCollection } from '../../utils/db'
 import { createToken, setAuthCookie } from '../../utils/auth'
+import { getFirebaseAuth } from '../../utils/firebase'
 import type { User } from '../../../types'
 
 export default defineEventHandler(async (event) => {
@@ -14,24 +15,22 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    // Verify Google token
-    const config = useRuntimeConfig()
-    const response = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${credential}`)
-    
-    if (!response.ok) {
+    // Verify Google ID token using Firebase Admin SDK
+    let googleUser: { email: string; name: string; sub: string; picture?: string }
+    try {
+      const firebaseAuth = getFirebaseAuth()
+      const decoded = await firebaseAuth.verifyIdToken(credential)
+      googleUser = {
+        email: decoded.email!,
+        name: decoded.name || decoded.email!.split('@')[0],
+        sub: decoded.uid,
+        picture: decoded.picture
+      }
+    } catch (firebaseError: any) {
+      console.error('Firebase token verification error:', firebaseError.message)
       throw createError({
         statusCode: 401,
         statusMessage: 'Invalid Google token'
-      })
-    }
-
-    const googleUser = await response.json()
-
-    // Verify the token is for our client
-    if (googleUser.aud !== config.googleClientId) {
-      throw createError({
-        statusCode: 401,
-        statusMessage: 'Invalid token audience'
       })
     }
 
@@ -39,7 +38,7 @@ export default defineEventHandler(async (event) => {
     const users = getCollection('users')
 
     // Check if user exists
-    let user = await users.findOne({ 
+    let user = await users.findOne({
       $or: [
         { email: googleUser.email },
         { googleId: googleUser.sub }
@@ -65,8 +64,8 @@ export default defineEventHandler(async (event) => {
       // Link Google account to existing user
       await users.updateOne(
         { _id: user._id },
-        { 
-          $set: { 
+        {
+          $set: {
             googleId: googleUser.sub,
             avatar: googleUser.picture || user.avatar
           }
@@ -76,14 +75,13 @@ export default defineEventHandler(async (event) => {
       user.avatar = googleUser.picture || user.avatar
     }
 
-    // Create JOSE token
+    // Issue our own JWT cookie (same as email/password flow)
     const token = await createToken({
       userId: user._id.toString(),
       email: user.email,
       name: user.name
     })
 
-    // Set HTTP-only cookie
     setAuthCookie(event, token)
 
     return {
@@ -95,10 +93,8 @@ export default defineEventHandler(async (event) => {
         avatar: user.avatar
       }
     }
-  } catch (error) {
-    if ((error as any).statusCode) {
-      throw error
-    }
+  } catch (error: any) {
+    if (error.statusCode) throw error
 
     console.error('Google OAuth error:', error)
     throw createError({

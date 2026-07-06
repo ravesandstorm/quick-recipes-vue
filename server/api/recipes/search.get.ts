@@ -56,25 +56,64 @@ export default defineEventHandler(async (event) => {
       }
     }
     
+    // Dietary filters
+    if (query.isGlutenFree === 'true' || query.isGlutenFree === true) matchStage.isGlutenFree = true
+    if (query.isLactoseFree === 'true' || query.isLactoseFree === true) matchStage.isLactoseFree = true
+
     if (Object.keys(matchStage).length > 0) {
       pipeline.push({ $match: matchStage })
     }
     
+    // Prepare string ID and ObjectId for lookups
+    pipeline.push({
+      $addFields: {
+        createdByIDObj: { $toObjectId: '$createdByID' },
+        recipeIdStr: { $toString: '$_id' }
+      }
+    })
+
     // Lookup creator information
     pipeline.push({
       $lookup: {
         from: 'users',
-        localField: 'createdByID',
+        localField: 'createdByIDObj',
         foreignField: '_id',
         as: 'creator'
       }
     })
-    
+
+    // Lookup favorites and ratings from relational tables
+    pipeline.push({
+      $lookup: {
+        from: 'favorites',
+        localField: 'recipeIdStr',
+        foreignField: 'recipeId',
+        as: 'favoriteDocs'
+      }
+    })
+
+    pipeline.push({
+      $lookup: {
+        from: 'ratings',
+        localField: 'recipeIdStr',
+        foreignField: 'recipeId',
+        as: 'ratingDocs'
+      }
+    })
+
     // Add computed fields
     pipeline.push({
       $addFields: {
         id: { $toString: '$_id' },
         createdBy: { $arrayElemAt: ['$creator.name', 0] },
+        favoriteCount: { $size: '$favoriteDocs' },
+        rating: {
+          $cond: {
+            if: { $gt: [{ $size: '$ratingDocs' }, 0] },
+            then: { $round: [{ $divide: [{ $sum: '$ratingDocs.rating' }, { $size: '$ratingDocs' }] }, 1] },
+            else: null
+          }
+        },
         score: query.query ? { $meta: 'textScore' } : 1
       }
     })
@@ -157,47 +196,12 @@ export default defineEventHandler(async (event) => {
         totalPages: Math.ceil(total / limit)
       }
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('Search error:', error)
-    
-    // Return sample search results for development
-    const sampleResults = [
-      {
-        id: '1',
-        title: 'Classic Spaghetti Carbonara',
-        description: 'A traditional Italian pasta dish with eggs, cheese, and pancetta',
-        calories: 520,
-        protein: 25,
-        carbs: 65,
-        rating: 4.8,
-        difficultyRating: 2,
-        favoriteCount: 156,
-        createdBy: 'Chef Mario',
-        createdAt: new Date()
-      },
-      {
-        id: '2',
-        title: 'Healthy Buddha Bowl',
-        description: 'Nutritious bowl with quinoa, roasted vegetables, and tahini dressing',
-        calories: 380,
-        protein: 15,
-        carbs: 45,
-        rating: 4.6,
-        difficultyRating: 1,
-        favoriteCount: 89,
-        createdBy: 'Sarah Green',
-        createdAt: new Date()
-      }
-    ]
-    
-    return {
-      success: true,
-      data: {
-        recipes: sampleResults,
-        total: sampleResults.length,
-        page: 1,
-        totalPages: 1
-      }
-    }
+    if (error.statusCode) throw error
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'Failed to search recipes'
+    })
   }
 })

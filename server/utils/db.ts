@@ -37,11 +37,9 @@ async function createIndexes() {
     await db.collection('users').createIndex({ email: 1 }, { unique: true })
     await db.collection('users').createIndex({ name: 1 })
     
-    // Recipe indexes for search
+    // Recipe indexes for search (favoriteCount/rating removed — computed from relational collections)
     await db.collection('recipes').createIndex({ title: 'text', description: 'text' })
-    await db.collection('recipes').createIndex({ createdByID: 1 })
-    await db.collection('recipes').createIndex({ favoriteCount: -1 })
-    await db.collection('recipes').createIndex({ rating: -1 })
+    await db.collection('recipes').createIndex({ createdByID: 1 })  // userRecipes FK
     await db.collection('recipes').createIndex({ calories: 1 })
     await db.collection('recipes').createIndex({ protein: 1 })
     await db.collection('recipes').createIndex({ carbs: 1 })
@@ -50,7 +48,20 @@ async function createIndexes() {
     // Ingredient indexes
     await db.collection('ingredients').createIndex({ name: 'text' })
     await db.collection('ingredients').createIndex({ name: 1 })
-    
+
+    // Favorites (relational table — replaces user.favRecipes array and recipe.favoriteCount)
+    await db.collection('favorites').createIndex({ userId: 1, recipeId: 1 }, { unique: true })
+    await db.collection('favorites').createIndex({ recipeId: 1 })
+
+    // Ratings (relational table)
+    await db.collection('ratings').createIndex({ userId: 1, recipeId: 1 }, { unique: true })
+    await db.collection('ratings').createIndex({ recipeId: 1 })
+
+    // Follows (relational table — replaces user.followers[] / user.following[])
+    await db.collection('follows').createIndex({ followerId: 1, followingId: 1 }, { unique: true })
+    await db.collection('follows').createIndex({ followingId: 1 })
+    await db.collection('follows').createIndex({ followerId: 1 })
+
     console.log('Database indexes created successfully')
   } catch (error) {
     console.error('Error creating indexes:', error)
